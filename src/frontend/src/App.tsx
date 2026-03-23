@@ -142,7 +142,7 @@ function Navbar() {
         </ul>
 
         <a
-          href="https://wa.me/919999999999?text=I%20want%20to%20order%20HydroElite%20500ml%20water%20bottle"
+          href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20500ml%20water%20bottle"
           target="_blank"
           rel="noopener noreferrer"
           className="hidden lg:flex items-center gap-2 border border-gold text-gold text-xs tracking-widest px-5 py-2.5 hover:bg-gold hover:text-black transition-all duration-300"
@@ -186,7 +186,7 @@ function Navbar() {
               ))}
               <li className="pt-2">
                 <a
-                  href="https://wa.me/919999999999?text=I%20want%20to%20order%20HydroElite%20500ml%20water%20bottle"
+                  href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20500ml%20water%20bottle"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex border border-gold text-gold text-xs tracking-widest px-5 py-2.5 hover:bg-gold hover:text-black transition-all"
@@ -465,7 +465,7 @@ function Product() {
 
             <div className="flex flex-col sm:flex-row gap-4 mt-4">
               <a
-                href="https://wa.me/919999999999?text=I%20want%20to%20order%20HydroElite%20500ml%20water%20bottle"
+                href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20500ml%20water%20bottle"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-3 bg-gold text-black text-xs tracking-widest px-8 py-4 hover:bg-gold-light transition-all duration-300 font-semibold"
@@ -525,7 +525,7 @@ function Contact() {
           <div className="flex flex-col gap-6 mb-14">
             <div className="flex items-center justify-center gap-4 text-[#B8B8B8] text-sm">
               <MapPin size={16} className="text-gold flex-shrink-0" />
-              <span>Connaught Place, New Delhi — 110001, India</span>
+              <span>New Friends Colony, New Delhi — 110025, India</span>
             </div>
             <div className="flex items-center justify-center gap-4 text-[#B8B8B8] text-sm">
               <Mail size={16} className="text-gold flex-shrink-0" />
@@ -539,16 +539,16 @@ function Contact() {
             <div className="flex items-center justify-center gap-4 text-[#B8B8B8] text-sm">
               <Phone size={16} className="text-gold flex-shrink-0" />
               <a
-                href="tel:+919999999999"
+                href="tel:+919990768012"
                 className="hover:text-gold transition-colors"
               >
-                +91 99999 99999
+                +91 9990768012
               </a>
             </div>
           </div>
 
           <a
-            href="https://wa.me/919999999999?text=Hello%20HydroElite%2C%20I%20would%20like%20to%20know%20more"
+            href="https://wa.me/919990768012?text=Hello%20HydroElite%2C%20I%20would%20like%20to%20know%20more"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-3 bg-gold text-black text-xs tracking-widest px-10 py-4 hover:bg-gold-light transition-all duration-300 font-semibold"
