@@ -93,6 +93,81 @@ function WhatsAppIcon() {
   );
 }
 
+// ── Modal ─────────────────────────────────────────────────────────────────────
+function Modal({
+  title,
+  onClose,
+  children,
+}: { title: string; onClose: () => void; children: React.ReactNode }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+      onClick={onClose}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") onClose();
+      }}
+      role="presentation"
+    >
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+      <div
+        className="relative w-full max-w-2xl max-h-[85vh] flex flex-col border"
+        style={{ background: "#111214", borderColor: "#2A2B2E" }}
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
+      >
+        <div
+          className="flex items-center justify-between px-6 py-5 border-b"
+          style={{ borderColor: "#2A2B2E" }}
+        >
+          <h2 className="font-display text-base tracking-widest text-gold font-semibold">
+            {title}
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-[#B8B8B8] hover:text-gold transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+            aria-label="Close"
+          >
+            <X size={18} />
+          </button>
+        </div>
+        <div className="overflow-y-auto px-6 py-6 text-[#B8B8B8] text-sm leading-relaxed space-y-5">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Floating WhatsApp Button (mobile only) ─────────────────────────────────
+function FloatingWhatsApp() {
+  return (
+    <a
+      href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20500ml%20water%20bottle"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Order on WhatsApp"
+      className="lg:hidden fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 rounded-full shadow-lg"
+      style={{ background: "#C9A84C" }}
+      data-ocid="whatsapp.primary_button"
+    >
+      <WhatsAppIcon />
+    </a>
+  );
+}
+
 // ── Navbar ──────────────────────────────────────────────────────────────────
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -108,31 +183,29 @@ function Navbar() {
     { label: "HOME", href: "#hero" },
     { label: "OUR WATER", href: "#features" },
     { label: "PRODUCTS", href: "#products" },
+    { label: "FOUNDER", href: "#founder" },
     { label: "CONTACT", href: "#contact" },
   ];
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled ? "bg-black/90 backdrop-blur-md shadow-lg" : "bg-transparent"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? "bg-black/90 backdrop-blur-md shadow-lg" : "bg-transparent"}`}
       style={{ borderBottom: scrolled ? "1px solid #2A2B2E" : "none" }}
     >
       <nav className="max-w-7xl mx-auto px-6 lg:px-10 h-16 md:h-20 flex items-center justify-between">
         <a
           href="#hero"
-          className="font-display text-xl md:text-2xl tracking-widest font-semibold text-gold"
+          className="font-display text-xl md:text-2xl tracking-widest font-semibold text-gold min-h-[44px] flex items-center"
           data-ocid="nav.link"
         >
           HYDROELITE
         </a>
-
         <ul className="hidden lg:flex items-center gap-8">
           {navLinks.map((link) => (
             <li key={link.href}>
               <a
                 href={link.href}
-                className="text-xs tracking-widest text-[#B8B8B8] hover:text-gold transition-colors duration-200 font-medium"
+                className="text-xs tracking-widest text-[#B8B8B8] hover:text-gold transition-colors duration-200 font-medium min-h-[44px] flex items-center"
                 data-ocid="nav.link"
               >
                 {link.label}
@@ -140,19 +213,17 @@ function Navbar() {
             </li>
           ))}
         </ul>
-
         <a
           href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20500ml%20water%20bottle"
           target="_blank"
           rel="noopener noreferrer"
-          className="hidden lg:flex items-center gap-2 border border-gold text-gold text-xs tracking-widest px-5 py-2.5 hover:bg-gold hover:text-black transition-all duration-300"
+          className="hidden lg:flex items-center gap-2 border border-gold text-gold text-xs tracking-widest px-5 py-2.5 hover:bg-gold hover:text-black transition-all duration-300 min-h-[44px]"
           data-ocid="nav.primary_button"
         >
           ORDER NOW
         </a>
-
         <button
-          className="lg:hidden text-gold p-2"
+          className="lg:hidden text-gold p-2 min-h-[44px] min-w-[44px] flex items-center justify-center"
           onClick={() => setMenuOpen((v) => !v)}
           aria-label="Toggle menu"
           data-ocid="nav.toggle"
@@ -177,7 +248,7 @@ function Navbar() {
                   <a
                     href={link.href}
                     onClick={() => setMenuOpen(false)}
-                    className="text-sm tracking-widest text-[#B8B8B8] hover:text-gold transition-colors"
+                    className="text-sm tracking-widest text-[#B8B8B8] hover:text-gold transition-colors min-h-[44px] flex items-center"
                     data-ocid="nav.link"
                   >
                     {link.label}
@@ -189,7 +260,7 @@ function Navbar() {
                   href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20500ml%20water%20bottle"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex border border-gold text-gold text-xs tracking-widest px-5 py-2.5 hover:bg-gold hover:text-black transition-all"
+                  className="flex items-center justify-center border border-gold text-gold text-xs tracking-widest px-5 py-3 hover:bg-gold hover:text-black transition-all w-full min-h-[44px]"
                   data-ocid="nav.primary_button"
                 >
                   ORDER NOW
@@ -222,30 +293,27 @@ function Hero() {
         className="absolute inset-0"
         style={{ background: "rgba(0,0,0,0.65)" }}
       />
-
       <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, ease: "easeOut" }}
         >
-          <p className="text-xs tracking-ultra text-gold mb-6 md:mb-8 font-sans">
+          <p className="text-xs tracking-ultra text-gold mb-4 md:mb-8 font-sans">
             PREMIUM WATER
           </p>
-          <h1 className="font-display text-6xl sm:text-7xl md:text-8xl lg:text-[7rem] xl:text-[8rem] leading-none tracking-widest font-bold text-gold mb-6">
+          <h1 className="font-display text-3xl sm:text-5xl md:text-8xl lg:text-[7rem] xl:text-[8rem] leading-none tracking-widest font-bold text-gold mb-4 md:mb-6">
             HYDROELITE
           </h1>
         </motion.div>
-
         <motion.p
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
-          className="text-base md:text-xl font-light tracking-widest text-[#B8B8B8] mb-10 md:mb-14"
+          className="text-sm md:text-xl font-light tracking-widest text-[#B8B8B8] mb-8 md:mb-14"
         >
           Pure Hydration. Elite Performance.
         </motion.p>
-
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -254,21 +322,20 @@ function Hero() {
         >
           <a
             href="#products"
-            className="border border-gold text-gold text-xs tracking-widest px-10 py-4 hover:bg-gold hover:text-black transition-all duration-300 font-medium"
+            className="w-full sm:w-auto border border-gold text-gold text-xs tracking-widest px-10 py-4 hover:bg-gold hover:text-black transition-all duration-300 font-medium text-center min-h-[44px] flex items-center justify-center"
             data-ocid="hero.primary_button"
           >
             EXPLORE THE ELITE
           </a>
           <a
             href="#features"
-            className="flex items-center gap-2 text-[#B8B8B8] text-xs tracking-widest hover:text-gold transition-colors"
+            className="flex items-center gap-2 text-[#B8B8B8] text-xs tracking-widest hover:text-gold transition-colors min-h-[44px]"
             data-ocid="hero.secondary_button"
           >
             DISCOVER MORE <ChevronDown size={14} className="animate-bounce" />
           </a>
         </motion.div>
       </div>
-
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
         <div className="w-px h-16 bg-gradient-to-b from-gold to-transparent opacity-60" />
       </div>
@@ -304,7 +371,7 @@ function Features() {
   return (
     <section
       id="features"
-      className="py-24 md:py-32"
+      className="py-16 md:py-24"
       style={{ background: "#111214" }}
       data-ocid="features.section"
     >
@@ -314,7 +381,7 @@ function Features() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.9 }}
-          className="text-center mb-16 md:mb-20"
+          className="text-center mb-12 md:mb-20"
         >
           <p className="text-xs tracking-ultra text-gold mb-4">
             EXCELLENCE IN EVERY DROP
@@ -324,7 +391,6 @@ function Features() {
           </h2>
           <div className="mt-6 mx-auto w-16 h-px bg-gold opacity-60" />
         </motion.div>
-
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0">
           {features.map((f, i) => (
             <motion.div
@@ -335,7 +401,7 @@ function Features() {
               transition={{ duration: 0.7, delay: i * 0.12 }}
               className="relative px-8 py-10 text-center group"
               style={{
-                borderLeft: i > 0 ? "1px solid #2A2B2E" : undefined,
+                borderLeft: i % 2 !== 0 ? "1px solid #2A2B2E" : undefined,
                 borderTop: "1px solid #2A2B2E",
               }}
               data-ocid={`features.item.${i + 1}`}
@@ -364,7 +430,7 @@ function Product() {
   return (
     <section
       id="products"
-      className="py-24 md:py-32 relative overflow-hidden"
+      className="py-16 md:py-24 relative overflow-hidden"
       style={{
         background:
           "linear-gradient(135deg, #0B0B0C 0%, #111214 50%, #0B0B0C 100%)",
@@ -378,14 +444,13 @@ function Product() {
             "linear-gradient(90deg, transparent, #C9A84C, transparent)",
         }}
       />
-
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.9 }}
-          className="text-center mb-16 md:mb-20"
+          className="text-center mb-12 md:mb-20"
         >
           <p className="text-xs tracking-ultra text-gold mb-4">
             OUR COLLECTION
@@ -395,8 +460,7 @@ function Product() {
           </h2>
           <div className="mt-6 mx-auto w-16 h-px bg-gold opacity-60" />
         </motion.div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 items-center">
           <motion.div
             initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -413,14 +477,13 @@ function Product() {
                 }}
               />
               <img
-                src="/assets/generated/hydroelite-bottle-transparent.dim_600x900.png"
+                src="/assets/uploads/9b8da43c-1038-44de-9af6-3bca1dd029b3-019d2aad-05eb-73cf-8d64-072fe93bca47-1.png"
                 alt="HydroElite 500ml Premium Water Bottle"
-                className="relative bottle-glow max-h-96 md:max-h-[500px] w-auto object-contain"
+                className="relative bottle-glow max-h-64 md:max-h-96 lg:max-h-[500px] w-auto object-contain"
                 data-ocid="products.card"
               />
             </div>
           </motion.div>
-
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -438,17 +501,13 @@ function Product() {
                 PREMIUM WATER
               </h3>
             </div>
-
             <div className="w-12 h-px bg-gold opacity-50" />
-
             <p className="text-[#B8B8B8] text-sm tracking-widest font-light">
               500ml Glass Bottle
             </p>
-
             <p className="font-display text-4xl md:text-5xl text-gold font-bold tracking-wide">
               ₹40
             </p>
-
             <ul className="flex flex-col gap-3 text-[13px] text-[#B8B8B8]">
               {[
                 "pH 8.5+ Alkaline Water",
@@ -462,13 +521,12 @@ function Product() {
                 </li>
               ))}
             </ul>
-
             <div className="flex flex-col sm:flex-row gap-4 mt-4">
               <a
                 href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20500ml%20water%20bottle"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-3 bg-gold text-black text-xs tracking-widest px-8 py-4 hover:bg-gold-light transition-all duration-300 font-semibold"
+                className="w-full sm:w-auto flex items-center justify-center gap-3 bg-gold text-black text-xs tracking-widest px-8 py-4 hover:opacity-90 transition-all duration-300 font-semibold min-h-[44px]"
                 data-ocid="products.primary_button"
               >
                 <WhatsAppIcon />
@@ -476,7 +534,7 @@ function Product() {
               </a>
               <button
                 type="button"
-                className="border border-[#2A2B2E] text-[#B8B8B8] text-xs tracking-widest px-8 py-4 hover:border-gold hover:text-gold transition-all duration-300"
+                className="w-full sm:w-auto border border-[#2A2B2E] text-[#B8B8B8] text-xs tracking-widest px-8 py-4 hover:border-gold hover:text-gold transition-all duration-300 min-h-[44px]"
                 data-ocid="products.secondary_button"
               >
                 SHOP NOW
@@ -485,7 +543,175 @@ function Product() {
           </motion.div>
         </div>
       </div>
+      <div
+        className="absolute bottom-0 left-0 right-0 h-px"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, #C9A84C, transparent)",
+        }}
+      />
+    </section>
+  );
+}
 
+// ── Founder ───────────────────────────────────────────────────────────────────
+function Founder() {
+  return (
+    <section
+      id="founder"
+      className="py-16 md:py-28 relative overflow-hidden"
+      style={{ background: "#0B0B0C" }}
+      data-ocid="founder.section"
+    >
+      {/* Top gold line */}
+      <div
+        className="absolute top-0 left-0 right-0 h-px"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, #C9A84C, transparent)",
+        }}
+      />
+
+      <div className="max-w-7xl mx-auto px-6 lg:px-10">
+        {/* Section label */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-12 md:mb-20"
+        >
+          <p className="text-xs tracking-ultra text-gold mb-4">
+            THE MIND BEHIND THE BRAND
+          </p>
+          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl tracking-widest text-[#F2F2F2] font-semibold">
+            MEET THE FOUNDER
+          </h2>
+          <div className="mt-6 mx-auto w-16 h-px bg-gold opacity-60" />
+        </motion.div>
+
+        {/* Two-column layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          {/* Left: Founder image */}
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            className="flex justify-center lg:justify-end"
+          >
+            <div className="relative">
+              {/* Gold glow behind image */}
+              <div
+                className="absolute -inset-4 blur-2xl opacity-20"
+                style={{
+                  background:
+                    "radial-gradient(ellipse at center, #C9A84C 0%, transparent 70%)",
+                }}
+              />
+              {/* Gold corner accents */}
+              <div
+                className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2"
+                style={{ borderColor: "#C9A84C" }}
+              />
+              <div
+                className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2"
+                style={{ borderColor: "#C9A84C" }}
+              />
+              <div
+                className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2"
+                style={{ borderColor: "#C9A84C" }}
+              />
+              <div
+                className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2"
+                style={{ borderColor: "#C9A84C" }}
+              />
+              <img
+                src="/assets/uploads/img_0997-019d2aa3-5dc8-773e-b833-43d83b9d789e-1.jpeg"
+                alt="Mohammed Asif Zardari — Founder & Visionary, Hydroelite"
+                className="relative w-full max-w-[320px] md:max-w-[380px] object-cover"
+                data-ocid="founder.card"
+              />
+            </div>
+          </motion.div>
+
+          {/* Right: Text content */}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
+            className="flex flex-col gap-6"
+          >
+            {/* Name & title */}
+            <div>
+              <h3 className="font-display text-2xl md:text-3xl lg:text-4xl tracking-widest text-[#F2F2F2] font-semibold leading-tight">
+                MOHAMMED ASIF ZARDARI
+              </h3>
+              <p className="text-xs tracking-ultra text-gold mt-3">
+                FOUNDER & VISIONARY, HYDROELITE
+              </p>
+            </div>
+
+            <div className="w-12 h-px bg-gold opacity-50" />
+
+            {/* Body text */}
+            <div className="flex flex-col gap-4 text-[#B8B8B8] text-sm leading-relaxed font-light">
+              <p>
+                Hydroelite was created with a vision to redefine the way people
+                experience water.
+              </p>
+              <p>
+                As someone who values health and performance, I realized that
+                hydration is often overlooked.
+              </p>
+              <p>
+                This brand represents a mindset — to never settle for average.
+              </p>
+            </div>
+
+            {/* Quote */}
+            <motion.blockquote
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+              className="border-l-2 pl-5 py-1"
+              style={{ borderColor: "#C9A84C" }}
+            >
+              <p className="font-display text-base md:text-lg text-gold italic tracking-wide leading-relaxed">
+                &ldquo;Hydration is not just a need &mdash; it&apos;s a
+                standard.&rdquo;
+              </p>
+            </motion.blockquote>
+
+            {/* Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 mt-2">
+              <a
+                href="https://wa.me/919990768012?text=Hello%20Mohammed%20Asif%2C%20I%20would%20like%20to%20connect%20with%20you%20regarding%20Hydroelite"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto flex items-center justify-center gap-3 bg-gold text-black text-xs tracking-widest px-8 py-4 hover:opacity-90 transition-all duration-300 font-semibold min-h-[44px]"
+                data-ocid="founder.primary_button"
+              >
+                <WhatsAppIcon />
+                MESSAGE FOUNDER
+              </a>
+              <a
+                href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20500ml%20water%20bottle"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto flex items-center justify-center border border-gold text-gold text-xs tracking-widest px-8 py-4 hover:bg-gold hover:text-black transition-all duration-300 font-semibold min-h-[44px]"
+                data-ocid="founder.secondary_button"
+              >
+                ORDER NOW
+              </a>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Bottom gold line */}
       <div
         className="absolute bottom-0 left-0 right-0 h-px"
         style={{
@@ -502,11 +728,11 @@ function Contact() {
   return (
     <section
       id="contact"
-      className="py-24 md:py-32"
+      className="py-16 md:py-24"
       style={{ background: "#111214" }}
       data-ocid="contact.section"
     >
-      <div className="max-w-3xl mx-auto px-6 text-center">
+      <div className="max-w-3xl mx-auto px-6 text-left md:text-center">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -517,46 +743,59 @@ function Contact() {
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl tracking-widest text-[#F2F2F2] font-semibold mb-4">
             CONNECT WITH HYDROELITE
           </h2>
-          <p className="text-xs tracking-widest text-gold mb-10">
+          <p className="text-xs tracking-widest text-gold mb-8 md:mb-10">
             NEW DELHI HEAD OFFICE
           </p>
-          <div className="w-16 h-px bg-gold opacity-50 mx-auto mb-14" />
-
-          <div className="flex flex-col gap-6 mb-14">
-            <div className="flex items-center justify-center gap-4 text-[#B8B8B8] text-sm">
-              <MapPin size={16} className="text-gold flex-shrink-0" />
+          <div className="w-16 h-px bg-gold opacity-50 md:mx-auto mb-10 md:mb-14" />
+          <div className="flex flex-col gap-5 mb-10 md:mb-14">
+            <div className="flex items-start md:items-center justify-start md:justify-center gap-4 text-[#B8B8B8] text-sm">
+              <MapPin
+                size={16}
+                className="text-gold flex-shrink-0 mt-0.5 md:mt-0"
+              />
               <span>New Friends Colony, New Delhi — 110025, India</span>
             </div>
-            <div className="flex items-center justify-center gap-4 text-[#B8B8B8] text-sm">
+            <div className="flex items-center justify-start md:justify-center gap-4 text-[#B8B8B8] text-sm">
               <Mail size={16} className="text-gold flex-shrink-0" />
               <a
-                href="mailto:hello@hydroelite.in"
-                className="hover:text-gold transition-colors"
+                href="mailto:officialhydroelite@gmail.com"
+                className="hover:text-gold transition-colors min-h-[44px] flex items-center"
               >
-                hello@hydroelite.in
+                officialhydroelite@gmail.com
               </a>
             </div>
-            <div className="flex items-center justify-center gap-4 text-[#B8B8B8] text-sm">
+            <div className="flex items-center justify-start md:justify-center gap-4 text-[#B8B8B8] text-sm">
               <Phone size={16} className="text-gold flex-shrink-0" />
               <a
                 href="tel:+919990768012"
-                className="hover:text-gold transition-colors"
+                className="hover:text-gold transition-colors min-h-[44px] flex items-center"
               >
                 +91 9990768012
               </a>
             </div>
           </div>
-
-          <a
-            href="https://wa.me/919990768012?text=Hello%20HydroElite%2C%20I%20would%20like%20to%20know%20more"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 bg-gold text-black text-xs tracking-widest px-10 py-4 hover:bg-gold-light transition-all duration-300 font-semibold"
-            data-ocid="contact.primary_button"
-          >
-            <WhatsAppIcon />
-            ORDER ON WHATSAPP
-          </a>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-start md:justify-center gap-4">
+            <a
+              href="https://wa.me/919990768012?text=Hello%20HydroElite%2C%20I%20would%20like%20to%20know%20more"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gold text-black text-xs tracking-widest px-10 py-4 hover:opacity-90 transition-all duration-300 font-semibold min-h-[44px]"
+              data-ocid="contact.primary_button"
+            >
+              <WhatsAppIcon />
+              ORDER ON WHATSAPP
+            </a>
+            <a
+              href="https://www.instagram.com/hydroelite_pvt/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-3 border border-gold text-gold text-xs tracking-widest px-10 py-4 hover:bg-gold hover:text-black transition-all duration-300 font-semibold min-h-[44px]"
+              data-ocid="contact.secondary_button"
+            >
+              <SiInstagram size={16} />
+              FOLLOW ON INSTAGRAM
+            </a>
+          </div>
         </motion.div>
       </div>
     </section>
@@ -568,87 +807,240 @@ function Footer() {
   const year = new Date().getFullYear();
   const hostname =
     typeof window !== "undefined" ? window.location.hostname : "hydroelite.in";
+  const [modal, setModal] = useState<"privacy" | "terms" | null>(null);
 
   return (
-    <footer
-      className="py-14 border-t"
-      style={{ background: "#0B0B0C", borderColor: "#2A2B2E" }}
-      data-ocid="footer.section"
-    >
-      <div className="max-w-7xl mx-auto px-6 lg:px-10">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="flex flex-col items-center md:items-start gap-4">
-            <span className="font-display text-2xl tracking-widest font-semibold text-gold">
-              HYDROELITE
-            </span>
-            <div className="flex items-center gap-4">
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram"
-                className="text-[#B8B8B8] hover:text-gold transition-colors"
-                data-ocid="footer.link"
-              >
-                <SiInstagram size={16} />
-              </a>
-              <a
-                href="https://facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Facebook"
-                className="text-[#B8B8B8] hover:text-gold transition-colors"
-                data-ocid="footer.link"
-              >
-                <SiFacebook size={16} />
-              </a>
-              <a
-                href="https://x.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="X / Twitter"
-                className="text-[#B8B8B8] hover:text-gold transition-colors"
-                data-ocid="footer.link"
-              >
-                <SiX size={16} />
-              </a>
-            </div>
-          </div>
-
-          <ul className="flex items-center gap-6 flex-wrap justify-center">
-            {["HOME", "OUR WATER", "PRODUCTS", "CONTACT"].map((link) => (
-              <li key={link}>
+    <>
+      <footer
+        className="py-14 border-t"
+        style={{ background: "#0B0B0C", borderColor: "#2A2B2E" }}
+        data-ocid="footer.section"
+      >
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="flex flex-col items-center md:items-start gap-4">
+              <span className="font-display text-2xl tracking-widest font-semibold text-gold">
+                HYDROELITE
+              </span>
+              <div className="flex items-center gap-4">
                 <a
-                  href={`#${link.toLowerCase().replace(" ", "-")}`}
-                  className="text-xs tracking-widest text-[#B8B8B8] hover:text-gold transition-colors"
+                  href="https://www.instagram.com/hydroelite_pvt/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="text-[#B8B8B8] hover:text-gold transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                   data-ocid="footer.link"
                 >
-                  {link}
+                  <SiInstagram size={16} />
                 </a>
-              </li>
-            ))}
-          </ul>
+                <a
+                  href="https://facebook.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="text-[#B8B8B8] hover:text-gold transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  data-ocid="footer.link"
+                >
+                  <SiFacebook size={16} />
+                </a>
+                <a
+                  href="https://x.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="X / Twitter"
+                  className="text-[#B8B8B8] hover:text-gold transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  data-ocid="footer.link"
+                >
+                  <SiX size={16} />
+                </a>
+              </div>
+            </div>
+            <ul className="flex flex-col md:flex-row items-center gap-2 md:gap-6">
+              {["HOME", "OUR WATER", "PRODUCTS", "FOUNDER", "CONTACT"].map(
+                (link) => (
+                  <li key={link}>
+                    <a
+                      href={`#${link.toLowerCase().replace(" ", "-")}`}
+                      className="text-xs tracking-widest text-[#B8B8B8] hover:text-gold transition-colors min-h-[44px] flex items-center"
+                      data-ocid="footer.link"
+                    >
+                      {link}
+                    </a>
+                  </li>
+                ),
+              )}
+            </ul>
+          </div>
+          <div
+            className="mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-[#B8B8B8]"
+            style={{ borderTop: "1px solid #2A2B2E" }}
+          >
+            <span>&copy; {year} HydroElite. All rights reserved.</span>
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={() => setModal("privacy")}
+                className="hover:text-gold transition-colors tracking-widest"
+                data-ocid="footer.link"
+              >
+                PRIVACY POLICY
+              </button>
+              <span className="text-[#2A2B2E]">|</span>
+              <button
+                type="button"
+                onClick={() => setModal("terms")}
+                className="hover:text-gold transition-colors tracking-widest"
+                data-ocid="footer.link"
+              >
+                TERMS &amp; CONDITIONS
+              </button>
+            </div>
+            <span>
+              Built with ❤️ using{" "}
+              <a
+                href={`https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(hostname)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-gold transition-colors"
+              >
+                caffeine.ai
+              </a>
+            </span>
+          </div>
         </div>
+      </footer>
 
-        <div
-          className="mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-[#B8B8B8]"
-          style={{ borderTop: "1px solid #2A2B2E" }}
-        >
-          <span>&copy; {year} HydroElite. All rights reserved.</span>
-          <span>
-            Built with ❤️ using{" "}
-            <a
-              href={`https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(hostname)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-gold transition-colors"
-            >
-              caffeine.ai
-            </a>
-          </span>
-        </div>
-      </div>
-    </footer>
+      {modal === "privacy" && (
+        <Modal title="PRIVACY POLICY" onClose={() => setModal(null)}>
+          <p className="text-gold text-xs tracking-widest">
+            Effective Date: 2024
+          </p>
+          <div className="space-y-4">
+            <section>
+              <h3 className="text-[#F2F2F2] text-xs tracking-widest font-semibold mb-2">
+                1. INFORMATION WE COLLECT
+              </h3>
+              <p>
+                When you place an order or contact us via our website or
+                WhatsApp, we may collect your name, phone number, delivery
+                address, and order details.
+              </p>
+            </section>
+            <section>
+              <h3 className="text-[#F2F2F2] text-xs tracking-widest font-semibold mb-2">
+                2. USE OF INFORMATION
+              </h3>
+              <p>
+                Your information is used solely to process and deliver your
+                orders and to communicate with you about your purchases. We do
+                not sell or share your personal data with third parties.
+              </p>
+            </section>
+            <section>
+              <h3 className="text-[#F2F2F2] text-xs tracking-widest font-semibold mb-2">
+                3. DATA SECURITY
+              </h3>
+              <p>
+                We take reasonable steps to protect your personal information.
+                However, no method of transmission over the internet is 100%
+                secure.
+              </p>
+            </section>
+            <section>
+              <h3 className="text-[#F2F2F2] text-xs tracking-widest font-semibold mb-2">
+                4. CONTACT
+              </h3>
+              <p>
+                For any privacy concerns, please contact us at{" "}
+                <a
+                  href="mailto:officialhydroelite@gmail.com"
+                  className="text-gold hover:underline"
+                >
+                  officialhydroelite@gmail.com
+                </a>
+                .
+              </p>
+            </section>
+          </div>
+        </Modal>
+      )}
+
+      {modal === "terms" && (
+        <Modal title="TERMS &amp; CONDITIONS" onClose={() => setModal(null)}>
+          <div className="space-y-4">
+            <section>
+              <h3 className="text-[#F2F2F2] text-xs tracking-widest font-semibold mb-2">
+                1. ABOUT US
+              </h3>
+              <p>
+                Hydroelite provides premium alkaline drinking water. Our goal is
+                to deliver clean, healthy, and refreshing water to our
+                customers.
+              </p>
+            </section>
+            <section>
+              <h3 className="text-[#F2F2F2] text-xs tracking-widest font-semibold mb-2">
+                2. PRODUCT INFORMATION
+              </h3>
+              <p>
+                We make every effort to ensure that product details, images, and
+                prices are accurate. Minor errors may happen; we reserve the
+                right to correct them.
+              </p>
+            </section>
+            <section>
+              <h3 className="text-[#F2F2F2] text-xs tracking-widest font-semibold mb-2">
+                3. ORDERS &amp; PAYMENTS
+              </h3>
+              <p>
+                Orders placed via our website or WhatsApp are subject to
+                confirmation. We reserve the right to accept or cancel orders at
+                our discretion.
+              </p>
+            </section>
+            <section>
+              <h3 className="text-[#F2F2F2] text-xs tracking-widest font-semibold mb-2">
+                4. PRICING
+              </h3>
+              <p>
+                Prices are as displayed on the website at the time of ordering.
+                Delivery charges (if any) will be communicated before confirming
+                your order.
+              </p>
+            </section>
+            <section>
+              <h3 className="text-[#F2F2F2] text-xs tracking-widest font-semibold mb-2">
+                5. DELIVERY
+              </h3>
+              <p>
+                We try our best to deliver within the estimated time. Delays may
+                occur due to unforeseen circumstances (weather, transport,
+                etc.).
+              </p>
+            </section>
+            <section>
+              <h3 className="text-[#F2F2F2] text-xs tracking-widest font-semibold mb-2">
+                6. USAGE
+              </h3>
+              <p>
+                Our water products are meant for daily hydration and wellness.
+                They are not a substitute for medical advice or treatment.
+              </p>
+            </section>
+            <section>
+              <h3 className="text-[#F2F2F2] text-xs tracking-widest font-semibold mb-2">
+                7. INTELLECTUAL PROPERTY
+              </h3>
+              <p>
+                All content on this website, including logos, images, and text,
+                is the property of Hydroelite. Do not use any content without
+                permission.
+              </p>
+            </section>
+          </div>
+        </Modal>
+      )}
+    </>
   );
 }
 
@@ -661,9 +1053,11 @@ export default function App() {
         <Hero />
         <Features />
         <Product />
+        <Founder />
         <Contact />
       </main>
       <Footer />
+      <FloatingWhatsApp />
     </div>
   );
 }
