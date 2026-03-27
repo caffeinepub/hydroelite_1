@@ -213,15 +213,20 @@ function Navbar() {
             </li>
           ))}
         </ul>
-        <a
-          href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20500ml%20water%20bottle"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hidden lg:flex items-center gap-2 border border-gold text-gold text-xs tracking-widest px-5 py-2.5 hover:bg-gold hover:text-black transition-all duration-300 min-h-[44px]"
-          data-ocid="nav.primary_button"
-        >
-          ORDER NOW
-        </a>
+
+        {/* Desktop right actions */}
+        <div className="hidden lg:flex items-center gap-3">
+          <a
+            href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20500ml%20water%20bottle"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 border border-gold text-gold text-xs tracking-widest px-5 py-2.5 hover:bg-gold hover:text-black transition-all duration-300 min-h-[44px]"
+            data-ocid="nav.primary_button"
+          >
+            ORDER NOW
+          </a>
+        </div>
+
         <button
           className="lg:hidden text-gold p-2 min-h-[44px] min-w-[44px] flex items-center justify-center"
           onClick={() => setMenuOpen((v) => !v)}
@@ -255,11 +260,13 @@ function Navbar() {
                   </a>
                 </li>
               ))}
+
               <li className="pt-2">
                 <a
                   href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20500ml%20water%20bottle"
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => setMenuOpen(false)}
                   className="flex items-center justify-center border border-gold text-gold text-xs tracking-widest px-5 py-3 hover:bg-gold hover:text-black transition-all w-full min-h-[44px]"
                   data-ocid="nav.primary_button"
                 >
@@ -477,7 +484,7 @@ function Product() {
                 }}
               />
               <img
-                src="/assets/uploads/9b8da43c-1038-44de-9af6-3bca1dd029b3-019d2aad-05eb-73cf-8d64-072fe93bca47-1.png"
+                src="/assets/uploads/8e81f487-0fb4-4a9f-94ea-dddfbe636747-019d2fa4-d6b1-74c5-a4dc-b5e51ef55933-1.png"
                 alt="HydroElite 500ml Premium Water Bottle"
                 className="relative bottle-glow max-h-64 md:max-h-96 lg:max-h-[500px] w-auto object-contain"
                 data-ocid="products.card"
@@ -503,7 +510,7 @@ function Product() {
             </div>
             <div className="w-12 h-px bg-gold opacity-50" />
             <p className="text-[#B8B8B8] text-sm tracking-widest font-light">
-              500ml Glass Bottle
+              500ml Bottle
             </p>
             <p className="font-display text-4xl md:text-5xl text-gold font-bold tracking-wide">
               ₹40
@@ -512,7 +519,7 @@ function Product() {
               {[
                 "pH 8.5+ Alkaline Water",
                 "7-Stage Filtration Process",
-                "BPA-Free Premium Glass",
+                "BPA-Free Premium Bottle",
                 "Naturally Sourced Minerals",
               ].map((item) => (
                 <li key={item} className="flex items-center gap-3">
@@ -688,7 +695,7 @@ function Founder() {
             {/* Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 mt-2">
               <a
-                href="https://wa.me/919990768012?text=Hello%20Mohammed%20Asif%2C%20I%20would%20like%20to%20connect%20with%20you%20regarding%20Hydroelite"
+                href="https://wa.me/919958740711?text=Hello%20Mohammed%20Asif%2C%20I%20would%20like%20to%20connect%20with%20you%20regarding%20Hydroelite"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto flex items-center justify-center gap-3 bg-gold text-black text-xs tracking-widest px-8 py-4 hover:opacity-90 transition-all duration-300 font-semibold min-h-[44px]"
@@ -696,15 +703,6 @@ function Founder() {
               >
                 <WhatsAppIcon />
                 MESSAGE FOUNDER
-              </a>
-              <a
-                href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20500ml%20water%20bottle"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto flex items-center justify-center border border-gold text-gold text-xs tracking-widest px-8 py-4 hover:bg-gold hover:text-black transition-all duration-300 font-semibold min-h-[44px]"
-                data-ocid="founder.secondary_button"
-              >
-                ORDER NOW
               </a>
             </div>
           </motion.div>
