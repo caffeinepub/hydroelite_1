@@ -587,6 +587,18 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
           alt={product.name.replace("\n", " ")}
           className="relative bottle-glow max-h-56 md:max-h-72 w-auto object-contain"
         />
+        {product.id === "premium20" && (
+          <div
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-sm font-bold tracking-widest z-10"
+            style={{
+              background: "rgba(0,0,0,0.75)",
+              color: "#C9A84C",
+              border: "1px solid #C9A84C",
+            }}
+          >
+            ₹20
+          </div>
+        )}
       </div>
 
       {/* Content */}
