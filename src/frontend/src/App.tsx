@@ -488,12 +488,11 @@ type Product = {
 const products: Product[] = [
   {
     id: "premium",
-    image:
-      "/assets/uploads/8e81f487-0fb4-4a9f-94ea-dddfbe636747-019d2fa4-d6b1-74c5-a4dc-b5e51ef55933-1.png",
+    image: "/assets/generated/hydroelite-ph8plus-black-gold.dim_600x900.png",
     label: "500ml Bottle",
     name: "HYDROELITE\npH8+ ALKALINE",
     tag: "ALKALINE WATER",
-    price: "₹40",
+    price: "₹65",
     badge: null,
     description: "",
     features: [
@@ -510,7 +509,7 @@ const products: Product[] = [
     label: "500ml Bottle",
     name: "HYDROELITE\nLEMON+",
     tag: "FLAVOURED RANGE",
-    price: "₹40",
+    price: "₹65",
     badge: null,
     description:
       "Premium packaged drinking water with added minerals and a refreshing lemon flavour. Processed through RO, UV and ozonization for purity and clean hydration.",
@@ -561,13 +560,15 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
           borderBottom: "1px solid #2A2B2E",
         }}
       >
-        <div
-          className="absolute inset-0 opacity-20"
-          style={{
-            background:
-              "radial-gradient(ellipse at 50% 70%, #C9A84C 0%, transparent 65%)",
-          }}
-        />
+        {product.id !== "basic" && (
+          <div
+            className="absolute inset-0 opacity-20"
+            style={{
+              background:
+                "radial-gradient(ellipse at 50% 70%, #C9A84C 0%, transparent 65%)",
+            }}
+          />
+        )}
         {product.badge && (
           <div
             className="absolute top-3 right-3 z-10 px-2.5 py-1 text-[10px] font-bold tracking-widest uppercase"
@@ -702,16 +703,28 @@ function Product() {
                   pH8+ PREMIUM
                 </span>
                 <span className="text-[#B8B8B8] text-[10px] tracking-widest">
-                  ₹40 · 500ml
+                  ₹65 · 500ml
                 </span>
               </div>
             </div>
-            <img
-              src="/assets/generated/hydroelite-comparison-bottles.dim_1200x700.png"
-              alt="HydroElite Basic vs pH8+ Premium comparison"
-              className="w-full object-cover"
-              style={{ maxHeight: "500px" }}
-            />
+            <div className="flex w-full" style={{ minHeight: "340px" }}>
+              <div className="flex-1 flex items-end justify-center overflow-hidden bg-[#0A0B0D] p-4">
+                <img
+                  src="/assets/uploads/chatgpt_image_mar_28_2026_12_09_38_pm-019d33a7-8871-754a-953a-e0c82ac733b9-1.png"
+                  alt="HydroElite Basic"
+                  className="object-contain w-full"
+                  style={{ maxHeight: "320px" }}
+                />
+              </div>
+              <div className="flex-1 flex items-end justify-center overflow-hidden bg-[#0A0B0D] p-4">
+                <img
+                  src="/assets/generated/hydroelite-ph8plus-black-gold.dim_600x900.png"
+                  alt="HydroElite pH8+ Premium"
+                  className="object-contain w-full"
+                  style={{ maxHeight: "320px" }}
+                />
+              </div>
+            </div>
             {/* Center divider line */}
             <div
               className="absolute inset-y-0 left-1/2 w-px opacity-40"
