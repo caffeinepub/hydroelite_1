@@ -1077,109 +1077,6 @@ function Contact() {
   );
 }
 
-// ── Distributor Section ───────────────────────────────────────────────────────
-const distributorBenefits = [
-  {
-    title: "HIGH MARGINS",
-    desc: "Competitive profit margins with volume-based incentives",
-  },
-  {
-    title: "BRAND SUPPORT",
-    desc: "Marketing materials, brand training, and dedicated support",
-  },
-  { title: "EXCLUSIVE ZONES", desc: "Dedicated territory rights in your area" },
-];
-
-function Distributor() {
-  return (
-    <section
-      id="distributor"
-      className="py-16 md:py-24 relative overflow-hidden"
-      style={{ background: "#0B0B0C" }}
-      data-ocid="distributor.section"
-    >
-      <div
-        className="absolute top-0 left-0 right-0 h-px"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, #C9A84C, transparent)",
-        }}
-      />
-      <div className="max-w-5xl mx-auto px-6 lg:px-10">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.9 }}
-          className="text-center mb-12 md:mb-16"
-        >
-          <p className="text-xs tracking-ultra text-gold mb-4">
-            BUSINESS OPPORTUNITY
-          </p>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl tracking-widest text-[#F2F2F2] font-semibold">
-            BECOME A DISTRIBUTOR
-          </h2>
-          <div className="mt-6 mx-auto w-16 h-px bg-gold opacity-60" />
-          <p className="mt-6 text-sm text-[#B8B8B8] leading-relaxed font-light max-w-xl mx-auto">
-            Join the HydroElite network. We&apos;re expanding across Delhi-NCR
-            and looking for dedicated distribution partners. Attractive margins,
-            reliable supply, and brand support.
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          {distributorBenefits.map((benefit, i) => (
-            <motion.div
-              key={benefit.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, delay: i * 0.15 }}
-              className="p-6 border text-center"
-              style={{ borderColor: "#2A2B2E", background: "#111214" }}
-              data-ocid={`distributor.item.${i + 1}`}
-            >
-              <h3 className="text-xs tracking-widest text-gold font-semibold mb-3">
-                {benefit.title}
-              </h3>
-              <div className="w-8 h-px bg-gold opacity-40 mx-auto mb-4" />
-              <p className="text-[13px] text-[#B8B8B8] leading-relaxed font-light">
-                {benefit.desc}
-              </p>
-            </motion.div>
-          ))}
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="flex justify-center"
-        >
-          <a
-            href="https://wa.me/919990768012?text=I%20am%20interested%20in%20becoming%20a%20HydroElite%20distributor"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-3 bg-gold text-black text-xs tracking-widest px-10 py-4 hover:opacity-90 transition-all duration-300 font-semibold min-h-[44px]"
-            data-ocid="distributor.primary_button"
-          >
-            <WhatsAppIcon />
-            ENQUIRE ON WHATSAPP
-          </a>
-        </motion.div>
-      </div>
-      <div
-        className="absolute bottom-0 left-0 right-0 h-px"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, #C9A84C, transparent)",
-        }}
-      />
-    </section>
-  );
-}
-
 // ── Footer ────────────────────────────────────────────────────────────────────
 function Footer() {
   const year = new Date().getFullYear();
@@ -1439,7 +1336,6 @@ export default function App() {
         <Availability />
         <Founder />
         <Contact />
-        <Distributor />
       </main>
       <Footer />
       <FloatingWhatsApp />
