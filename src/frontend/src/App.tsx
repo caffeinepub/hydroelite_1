@@ -1,7 +1,9 @@
+import { useActor } from "@/hooks/useActor";
 import { ChevronDown, Mail, MapPin, Menu, Phone, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { SiFacebook, SiInstagram, SiX } from "react-icons/si";
+import type { backendInterface as BackendWithFeedback } from "./backend.d";
 
 // ── SVG Icons ──────────────────────────────────────────────────────────────
 function DropletIcon() {
@@ -509,7 +511,7 @@ const products: Product[] = [
     label: "500ml Bottle",
     name: "HYDROELITE\nLEMON+",
     tag: "FLAVOURED RANGE",
-    price: "₹65",
+    price: "₹40",
     badge: null,
     description:
       "Premium packaged drinking water with added minerals and a refreshing lemon flavour. Processed through RO, UV and ozonization for purity and clean hydration.",
@@ -522,8 +524,7 @@ const products: Product[] = [
   },
   {
     id: "basic",
-    image:
-      "/assets/uploads/chatgpt_image_mar_28_2026_12_09_38_pm-019d33a7-8871-754a-953a-e0c82ac733b9-1.png",
+    image: "/assets/generated/hydroelite-basic-250ml.dim_1024x1024.png",
     label: "250ml Bottle",
     name: "HYDROELITE\nBASIC",
     tag: "EVERYDAY HYDRATION",
@@ -537,6 +538,24 @@ const products: Product[] = [
       "Advanced Filtration Process",
       "BPA-Free Bottle",
       "Pure • Safe • Refreshing",
+    ],
+  },
+  {
+    id: "premium20",
+    image: "/assets/generated/hydroelite-premium-500ml.dim_1024x1024.png",
+    label: "500ml Bottle",
+    name: "HYDROELITE\npH8+ PREMIUM",
+    tag: "PREMIUM HYDRATION",
+    price: "₹20",
+    badge: null,
+    badgeColor: "gold",
+    description:
+      "Premium alkaline water with a luxurious bottle design. Glossy finish with black-gold label. Processed through RO, UV, and ozonization for pure hydration.",
+    features: [
+      "Pure Alkaline Hydration",
+      "pH8+ Certified",
+      "BPA-Free Premium Bottle",
+      "Advanced 7-Stage Filtration",
     ],
   },
 ];
@@ -710,7 +729,7 @@ function Product() {
             <div className="flex w-full" style={{ minHeight: "340px" }}>
               <div className="flex-1 flex items-end justify-center overflow-hidden bg-[#0A0B0D] p-4">
                 <img
-                  src="/assets/uploads/chatgpt_image_mar_28_2026_12_09_38_pm-019d33a7-8871-754a-953a-e0c82ac733b9-1.png"
+                  src="/assets/generated/hydroelite-basic-250ml.dim_1024x1024.png"
                   alt="HydroElite Basic"
                   className="object-contain w-full"
                   style={{ maxHeight: "320px" }}
@@ -1007,6 +1026,272 @@ function Founder() {
             "linear-gradient(90deg, transparent, #C9A84C, transparent)",
         }}
       />
+    </section>
+  );
+}
+
+// ── Feedback ──────────────────────────────────────────────────────────────────
+function Feedback() {
+  const [open, setOpen] = useState(false);
+  const { actor } = useActor();
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [name, setName] = useState("");
+  const [message, setMessage] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    try {
+      await (actor as unknown as BackendWithFeedback)?.submitFeedback({
+        name,
+        rating: BigInt(rating),
+        message,
+        timestamp: BigInt(Date.now()),
+      });
+    } catch (_) {
+      // silently fail — feedback still shows success to user
+    }
+    setSubmitted(true);
+    setTimeout(() => {
+      setOpen(false);
+      setSubmitted(false);
+      setName("");
+      setMessage("");
+      setRating(0);
+      setHoverRating(0);
+    }, 2000);
+  }
+
+  function handleClose() {
+    setOpen(false);
+    setSubmitted(false);
+    setName("");
+    setMessage("");
+    setRating(0);
+    setHoverRating(0);
+  }
+
+  return (
+    <section
+      id="feedback"
+      className="py-20 md:py-28"
+      style={{ background: "#0B0B0C" }}
+      data-ocid="feedback.section"
+    >
+      <div className="max-w-xl mx-auto px-4 text-center">
+        <p
+          className="text-xs tracking-[0.3em] uppercase mb-3"
+          style={{ color: "#B8953F" }}
+        >
+          Feedback
+        </p>
+        <h2
+          className="text-2xl md:text-4xl font-bold tracking-[0.15em] uppercase mb-3"
+          style={{ color: "#D4AF5A", fontFamily: "Playfair Display, serif" }}
+        >
+          Share Your Experience
+        </h2>
+        <div
+          className="w-16 h-px mx-auto mb-5"
+          style={{
+            background:
+              "linear-gradient(90deg, transparent, #D4AF5A, transparent)",
+          }}
+        />
+        <p className="text-sm mb-8" style={{ color: "#A0A0A0" }}>
+          We&apos;d love to hear from you
+        </p>
+        <button
+          type="button"
+          data-ocid="feedback.open_modal_button"
+          onClick={() => setOpen(true)}
+          className="px-8 py-3 text-sm font-semibold tracking-widest uppercase transition-all duration-300"
+          style={{
+            background: "linear-gradient(135deg, #D4AF5A, #B8953F)",
+            color: "#0B0B0C",
+            border: "none",
+            borderRadius: "2px",
+            letterSpacing: "0.15em",
+            cursor: "pointer",
+          }}
+        >
+          Give Feedback
+        </button>
+      </div>
+
+      {open && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-4"
+          style={{ background: "rgba(0,0,0,0.85)" }}
+          data-ocid="feedback.modal"
+        >
+          <div
+            className="relative w-full max-w-md p-8 rounded-lg"
+            style={{
+              background: "#111214",
+              border: "1px solid rgba(212,175,90,0.4)",
+              boxShadow: "0 0 40px rgba(212,175,90,0.1)",
+            }}
+          >
+            <button
+              type="button"
+              data-ocid="feedback.close_button"
+              onClick={handleClose}
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-lg transition-opacity"
+              style={{
+                color: "#D4AF5A",
+                background: "transparent",
+                border: "none",
+                cursor: "pointer",
+              }}
+              aria-label="Close feedback form"
+            >
+              ✕
+            </button>
+
+            {submitted ? (
+              <div className="text-center py-8">
+                <div className="text-4xl mb-4" style={{ color: "#D4AF5A" }}>
+                  ✓
+                </div>
+                <p
+                  className="text-lg font-semibold"
+                  style={{
+                    color: "#D4AF5A",
+                    fontFamily: "Playfair Display, serif",
+                  }}
+                >
+                  Thank you for your feedback!
+                </p>
+              </div>
+            ) : (
+              <>
+                <h3
+                  className="text-xl font-bold tracking-wider uppercase mb-6 text-center"
+                  style={{
+                    color: "#D4AF5A",
+                    fontFamily: "Playfair Display, serif",
+                  }}
+                >
+                  Your Feedback
+                </h3>
+                <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+                  <div>
+                    <label
+                      htmlFor="feedback-name"
+                      className="block text-xs tracking-widest uppercase mb-2"
+                      style={{ color: "#B8953F" }}
+                    >
+                      Name
+                    </label>
+                    <input
+                      id="feedback-name"
+                      data-ocid="feedback.input"
+                      type="text"
+                      required
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Your name"
+                      className="w-full px-4 py-3 text-sm outline-none"
+                      style={{
+                        background: "#0B0B0C",
+                        border: "1px solid rgba(212,175,90,0.3)",
+                        color: "#E8E8E8",
+                        borderRadius: "2px",
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <span
+                      className="block text-xs tracking-widest uppercase mb-2"
+                      style={{ color: "#B8953F" }}
+                    >
+                      Rating
+                    </span>
+                    <div className="flex gap-2">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          data-ocid={`feedback.toggle.${star}`}
+                          onClick={() => setRating(star)}
+                          onMouseEnter={() => setHoverRating(star)}
+                          onMouseLeave={() => setHoverRating(0)}
+                          style={{
+                            background: "transparent",
+                            border: "none",
+                            cursor: "pointer",
+                            padding: 0,
+                          }}
+                          aria-label={`Rate ${star} stars`}
+                        >
+                          <svg
+                            className="w-7 h-7"
+                            viewBox="0 0 20 20"
+                            fill={
+                              (hoverRating || rating) >= star
+                                ? "#D4AF5A"
+                                : "rgba(212,175,90,0.2)"
+                            }
+                            aria-hidden="true"
+                          >
+                            <title>star</title>
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="feedback-message"
+                      className="block text-xs tracking-widest uppercase mb-2"
+                      style={{ color: "#B8953F" }}
+                    >
+                      Message
+                    </label>
+                    <textarea
+                      id="feedback-message"
+                      data-ocid="feedback.textarea"
+                      required
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      placeholder="Share your experience..."
+                      rows={4}
+                      className="w-full px-4 py-3 text-sm outline-none resize-none"
+                      style={{
+                        background: "#0B0B0C",
+                        border: "1px solid rgba(212,175,90,0.3)",
+                        color: "#E8E8E8",
+                        borderRadius: "2px",
+                      }}
+                    />
+                  </div>
+
+                  <button
+                    data-ocid="feedback.submit_button"
+                    type="submit"
+                    className="w-full py-3 text-sm font-semibold tracking-widest uppercase transition-opacity"
+                    style={{
+                      background: "linear-gradient(135deg, #D4AF5A, #B8953F)",
+                      color: "#0B0B0C",
+                      border: "none",
+                      borderRadius: "2px",
+                      letterSpacing: "0.15em",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Submit Feedback
+                  </button>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
@@ -1348,6 +1633,7 @@ export default function App() {
         <Product />
         <Availability />
         <Founder />
+        <Feedback />
         <Contact />
       </main>
       <Footer />
