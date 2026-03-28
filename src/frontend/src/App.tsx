@@ -155,7 +155,7 @@ function Modal({
 function FloatingWhatsApp() {
   return (
     <a
-      href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20500ml%20water%20bottle"
+      href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20water"
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Order on WhatsApp"
@@ -183,6 +183,7 @@ function Navbar() {
     { label: "HOME", href: "#hero" },
     { label: "OUR WATER", href: "#features" },
     { label: "PRODUCTS", href: "#products" },
+    { label: "AVAILABILITY", href: "#availability" },
     { label: "FOUNDER", href: "#founder" },
     { label: "CONTACT", href: "#contact" },
   ];
@@ -200,7 +201,7 @@ function Navbar() {
         >
           HYDROELITE
         </a>
-        <ul className="hidden lg:flex items-center gap-8">
+        <ul className="hidden lg:flex items-center gap-6">
           {navLinks.map((link) => (
             <li key={link.href}>
               <a
@@ -213,11 +214,9 @@ function Navbar() {
             </li>
           ))}
         </ul>
-
-        {/* Desktop right actions */}
         <div className="hidden lg:flex items-center gap-3">
           <a
-            href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20500ml%20water%20bottle"
+            href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20water"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 border border-gold text-gold text-xs tracking-widest px-5 py-2.5 hover:bg-gold hover:text-black transition-all duration-300 min-h-[44px]"
@@ -226,7 +225,6 @@ function Navbar() {
             ORDER NOW
           </a>
         </div>
-
         <button
           className="lg:hidden text-gold p-2 min-h-[44px] min-w-[44px] flex items-center justify-center"
           onClick={() => setMenuOpen((v) => !v)}
@@ -260,10 +258,9 @@ function Navbar() {
                   </a>
                 </li>
               ))}
-
               <li className="pt-2">
                 <a
-                  href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20500ml%20water%20bottle"
+                  href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20water"
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setMenuOpen(false)}
@@ -335,11 +332,15 @@ function Hero() {
             EXPLORE THE ELITE
           </a>
           <a
-            href="#features"
-            className="flex items-center gap-2 text-[#B8B8B8] text-xs tracking-widest hover:text-gold transition-colors min-h-[44px]"
+            href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20water"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 text-xs tracking-widest px-10 py-4 font-semibold min-h-[44px] transition-all duration-300"
+            style={{ background: "#25D366", color: "#fff" }}
             data-ocid="hero.secondary_button"
           >
-            DISCOVER MORE <ChevronDown size={14} className="animate-bounce" />
+            <WhatsAppIcon />
+            ORDER ON WHATSAPP
           </a>
         </motion.div>
       </div>
@@ -432,7 +433,206 @@ function Features() {
   );
 }
 
-// ── Product ───────────────────────────────────────────────────────────────────
+// ── FSSAI Trust Strip ─────────────────────────────────────────────────────────
+function TrustStrip() {
+  const items = [
+    { icon: "🛡️", label: "FSSAI Licensed" },
+    { icon: "✅", label: "BIS Certified" },
+  ];
+  return (
+    <div
+      className="w-full py-3 px-4"
+      style={{
+        background: "#111214",
+        borderBottom: "1px solid #2A2B2E",
+        borderTop: "1px solid #2A2B2E",
+      }}
+    >
+      <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-center gap-4 md:gap-0">
+        {items.map((item, i) => (
+          <div key={item.label} className="flex items-center gap-2">
+            {i > 0 && (
+              <span
+                className="hidden md:block w-1 h-1 rounded-full mx-4"
+                style={{ background: "#C9A84C" }}
+              />
+            )}
+            <span className="text-base">{item.icon}</span>
+            <span
+              className="text-xs tracking-widest font-medium"
+              style={{ color: "#C9A84C" }}
+            >
+              {item.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Product Card ──────────────────────────────────────────────────────────────
+type Product = {
+  id: string;
+  image: string;
+  label: string;
+  name: string;
+  tag: string;
+  price: string;
+  badge: string | null;
+  badgeColor?: string;
+  description: string;
+  features: string[];
+};
+
+const products: Product[] = [
+  {
+    id: "premium",
+    image:
+      "/assets/uploads/8e81f487-0fb4-4a9f-94ea-dddfbe636747-019d2fa4-d6b1-74c5-a4dc-b5e51ef55933-1.png",
+    label: "500ml Bottle",
+    name: "HYDROELITE\npH8+ ALKALINE",
+    tag: "ALKALINE WATER",
+    price: "₹40",
+    badge: null,
+    description: "",
+    features: [
+      "pH 8.5+ Certified Alkaline",
+      "7-Stage Filtration Process",
+      "BPA-Free Premium Bottle",
+      "Naturally Sourced Minerals",
+    ],
+  },
+  {
+    id: "lemon",
+    image:
+      "/assets/uploads/chatgpt_image_mar_28_2026_12_58_56_pm-019d3359-2132-749c-ba8a-7a112c316cfc-1.png",
+    label: "500ml Bottle",
+    name: "HYDROELITE\nLEMON+",
+    tag: "FLAVOURED RANGE",
+    price: "₹40",
+    badge: null,
+    description:
+      "Premium packaged drinking water with added minerals and a refreshing lemon flavour. Processed through RO, UV and ozonization for purity and clean hydration.",
+    features: [
+      "pH 8+ Alkaline Water",
+      "Infused with Lemon Essence",
+      "Electrolytes Added",
+      "RO + UV + Ozonized",
+    ],
+  },
+  {
+    id: "basic",
+    image:
+      "/assets/uploads/chatgpt_image_mar_28_2026_12_09_38_pm-019d33a7-8871-754a-953a-e0c82ac733b9-1.png",
+    label: "250ml Bottle",
+    name: "HYDROELITE\nBASIC",
+    tag: "EVERYDAY HYDRATION",
+    price: "₹10",
+    badge: "₹10 ONLY",
+    badgeColor: "blue",
+    description:
+      "Pure, safe, and refreshing packaged drinking water. Processed through advanced filtration for clean hydration every time. Perfect for daily use, travel, and on-the-go.",
+    features: [
+      "BIS Certified Packaged Water",
+      "Advanced Filtration Process",
+      "BPA-Free Bottle",
+      "Pure • Safe • Refreshing",
+    ],
+  },
+];
+
+function ProductCard({ product, index }: { product: Product; index: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8, delay: index * 0.15, ease: "easeOut" }}
+      className="flex flex-col border h-full"
+      style={{ borderColor: "#2A2B2E", background: "#0D0D0F" }}
+      data-ocid={`products.item.${index + 1}`}
+    >
+      {/* Image */}
+      <div
+        className="relative flex items-center justify-center py-10 px-6"
+        style={{
+          background: "linear-gradient(180deg, #111214 0%, #0B0B0C 100%)",
+          borderBottom: "1px solid #2A2B2E",
+        }}
+      >
+        <div
+          className="absolute inset-0 opacity-20"
+          style={{
+            background:
+              "radial-gradient(ellipse at 50% 70%, #C9A84C 0%, transparent 65%)",
+          }}
+        />
+        {product.badge && (
+          <div
+            className="absolute top-3 right-3 z-10 px-2.5 py-1 text-[10px] font-bold tracking-widest uppercase"
+            style={
+              product.badgeColor === "gold"
+                ? { background: "#C9A84C", color: "#000" }
+                : { background: "#1E6FD9", color: "#fff" }
+            }
+          >
+            {product.badge}
+          </div>
+        )}
+        <img
+          src={product.image}
+          alt={product.name.replace("\n", " ")}
+          className="relative bottle-glow max-h-56 md:max-h-72 w-auto object-contain"
+        />
+      </div>
+
+      {/* Content */}
+      <div className="flex flex-col flex-1 p-6 md:p-8 gap-4">
+        <div>
+          <p className="text-xs tracking-ultra text-gold mb-2">{product.tag}</p>
+          <h3 className="font-display text-xl md:text-2xl tracking-widest text-[#F2F2F2] font-semibold leading-tight whitespace-pre-line">
+            {product.name}
+          </h3>
+        </div>
+        <div className="w-8 h-px bg-gold opacity-50" />
+        <p className="text-[#B8B8B8] text-xs tracking-widest font-light">
+          {product.label}
+        </p>
+        {product.description && (
+          <p className="text-[#B8B8B8] text-[13px] leading-relaxed font-light">
+            {product.description}
+          </p>
+        )}
+        <p className="font-display text-3xl md:text-4xl text-gold font-bold tracking-wide">
+          {product.price}
+        </p>
+        <ul className="flex flex-col gap-2 text-[13px] text-[#B8B8B8]">
+          {product.features.map((item) => (
+            <li key={item} className="flex items-center gap-3">
+              <div className="w-1 h-1 rounded-full bg-gold flex-shrink-0" />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-auto pt-4">
+          <a
+            href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20water"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full flex items-center justify-center gap-3 bg-gold text-black text-xs tracking-widest px-6 py-4 hover:opacity-90 transition-all duration-300 font-semibold min-h-[44px]"
+            data-ocid={`products.primary_button.${index + 1}`}
+          >
+            <WhatsAppIcon />
+            ORDER ON WHATSAPP
+          </a>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// ── Product Section ───────────────────────────────────────────────────────────
 function Product() {
   return (
     <section
@@ -452,12 +652,16 @@ function Product() {
         }}
       />
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
+        {/* Trust Strip */}
+        <TrustStrip />
+
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.9 }}
-          className="text-center mb-12 md:mb-20"
+          className="text-center mb-12 md:mb-16 mt-12"
         >
           <p className="text-xs tracking-ultra text-gold mb-4">
             OUR COLLECTION
@@ -467,88 +671,171 @@ function Product() {
           </h2>
           <div className="mt-6 mx-auto w-16 h-px bg-gold opacity-60" />
         </motion.div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 items-center">
-          <motion.div
-            initial={{ opacity: 0, x: -40 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            className="flex justify-center lg:justify-end"
+
+        {/* Product Comparison */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.9 }}
+          className="mb-12 md:mb-16"
+        >
+          <div
+            className="relative overflow-hidden border"
+            style={{ borderColor: "#2A2B2E" }}
           >
-            <div className="relative">
-              <div
-                className="absolute inset-0 rounded-full blur-3xl opacity-20"
-                style={{
-                  background:
-                    "radial-gradient(circle, #C9A84C, transparent 70%)",
-                }}
-              />
-              <img
-                src="/assets/uploads/8e81f487-0fb4-4a9f-94ea-dddfbe636747-019d2fa4-d6b1-74c5-a4dc-b5e51ef55933-1.png"
-                alt="HydroElite 500ml Premium Water Bottle"
-                className="relative bottle-glow max-h-64 md:max-h-96 lg:max-h-[500px] w-auto object-contain"
-                data-ocid="products.card"
-              />
+            {/* Labels */}
+            <div className="absolute top-4 left-0 right-0 z-10 flex justify-around px-8 pointer-events-none">
+              <div className="flex flex-col items-center gap-1">
+                <span className="bg-blue-600 text-white text-[10px] tracking-widest px-3 py-1 font-semibold">
+                  BASIC
+                </span>
+                <span className="text-[#B8B8B8] text-[10px] tracking-widest">
+                  ₹10 · 250ml
+                </span>
+              </div>
+              <div className="flex flex-col items-center gap-1">
+                <span
+                  className="text-[10px] tracking-widest px-3 py-1 font-semibold"
+                  style={{ background: "#C9A84C", color: "#000" }}
+                >
+                  pH8+ PREMIUM
+                </span>
+                <span className="text-[#B8B8B8] text-[10px] tracking-widest">
+                  ₹40 · 500ml
+                </span>
+              </div>
             </div>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
-            className="flex flex-col gap-6"
-          >
-            <div>
-              <p className="text-xs tracking-ultra text-gold mb-3">
-                PREMIUM HYDRATION
-              </p>
-              <h3 className="font-display text-3xl md:text-4xl lg:text-5xl tracking-widest text-[#F2F2F2] font-semibold leading-tight">
-                HYDROELITE
-                <br />
-                PREMIUM WATER
-              </h3>
-            </div>
-            <div className="w-12 h-px bg-gold opacity-50" />
-            <p className="text-[#B8B8B8] text-sm tracking-widest font-light">
-              500ml Bottle
-            </p>
-            <p className="font-display text-4xl md:text-5xl text-gold font-bold tracking-wide">
-              ₹40
-            </p>
-            <ul className="flex flex-col gap-3 text-[13px] text-[#B8B8B8]">
-              {[
-                "pH 8.5+ Alkaline Water",
-                "7-Stage Filtration Process",
-                "BPA-Free Premium Bottle",
-                "Naturally Sourced Minerals",
-              ].map((item) => (
-                <li key={item} className="flex items-center gap-3">
-                  <div className="w-1 h-1 rounded-full bg-gold flex-shrink-0" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-            <div className="flex flex-col sm:flex-row gap-4 mt-4">
-              <a
-                href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20500ml%20water%20bottle"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto flex items-center justify-center gap-3 bg-gold text-black text-xs tracking-widest px-8 py-4 hover:opacity-90 transition-all duration-300 font-semibold min-h-[44px]"
-                data-ocid="products.primary_button"
-              >
-                <WhatsAppIcon />
-                ORDER ON WHATSAPP
-              </a>
-              <button
-                type="button"
-                className="w-full sm:w-auto border border-[#2A2B2E] text-[#B8B8B8] text-xs tracking-widest px-8 py-4 hover:border-gold hover:text-gold transition-all duration-300 min-h-[44px]"
-                data-ocid="products.secondary_button"
-              >
-                SHOP NOW
-              </button>
-            </div>
-          </motion.div>
+            <img
+              src="/assets/generated/hydroelite-comparison-bottles.dim_1200x700.png"
+              alt="HydroElite Basic vs pH8+ Premium comparison"
+              className="w-full object-cover"
+              style={{ maxHeight: "500px" }}
+            />
+            {/* Center divider line */}
+            <div
+              className="absolute inset-y-0 left-1/2 w-px opacity-40"
+              style={{ background: "#C9A84C" }}
+            />
+          </div>
+          <p className="text-center text-[11px] tracking-widest text-[#B8B8B8] mt-4">
+            CHOOSE YOUR HYDRATION · BOTH AVAILABLE ACROSS SOUTH DELHI
+          </p>
+        </motion.div>
+
+        {/* Product Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch">
+          {products.map((product, i) => (
+            <ProductCard key={product.id} product={product} index={i} />
+          ))}
         </div>
+      </div>
+      <div
+        className="absolute bottom-0 left-0 right-0 h-px"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, #C9A84C, transparent)",
+        }}
+      />
+    </section>
+  );
+}
+
+// ── Availability Section ──────────────────────────────────────────────────────
+const southDelhiAreas = [
+  "New Friends Colony",
+  "Greater Kailash",
+  "Saket",
+  "Hauz Khas",
+  "Lajpat Nagar",
+  "Nehru Place",
+  "Malviya Nagar",
+  "Vasant Kunj",
+  "Defence Colony",
+  "South Extension",
+];
+
+function Availability() {
+  return (
+    <section
+      id="availability"
+      className="py-16 md:py-24 relative overflow-hidden"
+      style={{ background: "#111214" }}
+      data-ocid="availability.section"
+    >
+      <div
+        className="absolute top-0 left-0 right-0 h-px"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, #C9A84C, transparent)",
+        }}
+      />
+      <div className="max-w-5xl mx-auto px-6 lg:px-10">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.9 }}
+          className="text-center mb-10 md:mb-16"
+        >
+          <p className="text-xs tracking-ultra text-gold mb-4">
+            SERVING SOUTH DELHI
+          </p>
+          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl tracking-widest text-[#F2F2F2] font-semibold">
+            AVAILABLE NEAR YOU
+          </h2>
+          <div className="mt-6 mx-auto w-16 h-px bg-gold opacity-60" />
+          <p className="mt-6 text-sm text-[#B8B8B8] leading-relaxed font-light max-w-xl mx-auto">
+            Same-day delivery across South Delhi. Order now and get fresh
+            HydroElite water at your doorstep.
+          </p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="flex flex-wrap justify-center gap-3 mb-10"
+        >
+          {southDelhiAreas.map((area, i) => (
+            <motion.span
+              key={area}
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: i * 0.06 }}
+              className="px-4 py-2 text-xs tracking-widest font-medium border"
+              style={{
+                borderColor: "#C9A84C",
+                color: "#C9A84C",
+                background: "#0B0B0C",
+              }}
+              data-ocid={`availability.item.${i + 1}`}
+            >
+              {area}
+            </motion.span>
+          ))}
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="flex justify-center"
+        >
+          <a
+            href="https://wa.me/919990768012?text=I%20want%20to%20check%20delivery%20availability%20in%20my%20area"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-3 bg-gold text-black text-xs tracking-widest px-10 py-4 hover:opacity-90 transition-all duration-300 font-semibold min-h-[44px]"
+            data-ocid="availability.primary_button"
+          >
+            <WhatsAppIcon />
+            CHECK YOUR AREA
+          </a>
+        </motion.div>
       </div>
       <div
         className="absolute bottom-0 left-0 right-0 h-px"
@@ -570,7 +857,6 @@ function Founder() {
       style={{ background: "#0B0B0C" }}
       data-ocid="founder.section"
     >
-      {/* Top gold line */}
       <div
         className="absolute top-0 left-0 right-0 h-px"
         style={{
@@ -578,9 +864,7 @@ function Founder() {
             "linear-gradient(90deg, transparent, #C9A84C, transparent)",
         }}
       />
-
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
-        {/* Section label */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -596,10 +880,7 @@ function Founder() {
           </h2>
           <div className="mt-6 mx-auto w-16 h-px bg-gold opacity-60" />
         </motion.div>
-
-        {/* Two-column layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          {/* Left: Founder image */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -608,7 +889,6 @@ function Founder() {
             className="flex justify-center lg:justify-end"
           >
             <div className="relative">
-              {/* Gold glow behind image */}
               <div
                 className="absolute -inset-4 blur-2xl opacity-20"
                 style={{
@@ -616,33 +896,40 @@ function Founder() {
                     "radial-gradient(ellipse at center, #C9A84C 0%, transparent 70%)",
                 }}
               />
-              {/* Gold corner accents */}
               <div
-                className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2"
+                className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 z-10"
                 style={{ borderColor: "#C9A84C" }}
               />
               <div
-                className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2"
+                className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 z-10"
                 style={{ borderColor: "#C9A84C" }}
               />
               <div
-                className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2"
+                className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 z-10"
                 style={{ borderColor: "#C9A84C" }}
               />
               <div
-                className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2"
+                className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 z-10"
                 style={{ borderColor: "#C9A84C" }}
               />
-              <img
-                src="/assets/uploads/img_0997-019d2aa3-5dc8-773e-b833-43d83b9d789e-1.jpeg"
-                alt="Mohammed Asif Zardari — Founder & Visionary, Hydroelite"
-                className="relative w-full max-w-[320px] md:max-w-[380px] object-cover"
-                data-ocid="founder.card"
-              />
+              <div className="relative overflow-hidden max-w-[320px] md:max-w-[380px]">
+                <img
+                  src="/assets/uploads/img_0997-019d2fb0-03ad-713a-9c03-d47e194d3583-1.jpeg"
+                  alt="Mohammed Asif Zardari — Founder & Visionary, Hydroelite"
+                  className="relative w-full object-cover block"
+                  style={{ filter: "brightness(0.85) contrast(1.05)" }}
+                  data-ocid="founder.card"
+                />
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    background:
+                      "linear-gradient(to bottom, transparent 60%, #0B0B0C 100%)",
+                  }}
+                />
+              </div>
             </div>
           </motion.div>
-
-          {/* Right: Text content */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -650,7 +937,6 @@ function Founder() {
             transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
             className="flex flex-col gap-6"
           >
-            {/* Name & title */}
             <div>
               <h3 className="font-display text-2xl md:text-3xl lg:text-4xl tracking-widest text-[#F2F2F2] font-semibold leading-tight">
                 MOHAMMED ASIF ZARDARI
@@ -659,10 +945,7 @@ function Founder() {
                 FOUNDER & VISIONARY, HYDROELITE
               </p>
             </div>
-
             <div className="w-12 h-px bg-gold opacity-50" />
-
-            {/* Body text */}
             <div className="flex flex-col gap-4 text-[#B8B8B8] text-sm leading-relaxed font-light">
               <p>
                 Hydroelite was created with a vision to redefine the way people
@@ -676,8 +959,6 @@ function Founder() {
                 This brand represents a mindset — to never settle for average.
               </p>
             </div>
-
-            {/* Quote */}
             <motion.blockquote
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -691,8 +972,6 @@ function Founder() {
                 standard.&rdquo;
               </p>
             </motion.blockquote>
-
-            {/* Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 mt-2">
               <a
                 href="https://wa.me/919958740711?text=Hello%20Mohammed%20Asif%2C%20I%20would%20like%20to%20connect%20with%20you%20regarding%20Hydroelite"
@@ -708,8 +987,6 @@ function Founder() {
           </motion.div>
         </div>
       </div>
-
-      {/* Bottom gold line */}
       <div
         className="absolute bottom-0 left-0 right-0 h-px"
         style={{
@@ -800,6 +1077,109 @@ function Contact() {
   );
 }
 
+// ── Distributor Section ───────────────────────────────────────────────────────
+const distributorBenefits = [
+  {
+    title: "HIGH MARGINS",
+    desc: "Competitive profit margins with volume-based incentives",
+  },
+  {
+    title: "BRAND SUPPORT",
+    desc: "Marketing materials, brand training, and dedicated support",
+  },
+  { title: "EXCLUSIVE ZONES", desc: "Dedicated territory rights in your area" },
+];
+
+function Distributor() {
+  return (
+    <section
+      id="distributor"
+      className="py-16 md:py-24 relative overflow-hidden"
+      style={{ background: "#0B0B0C" }}
+      data-ocid="distributor.section"
+    >
+      <div
+        className="absolute top-0 left-0 right-0 h-px"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, #C9A84C, transparent)",
+        }}
+      />
+      <div className="max-w-5xl mx-auto px-6 lg:px-10">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.9 }}
+          className="text-center mb-12 md:mb-16"
+        >
+          <p className="text-xs tracking-ultra text-gold mb-4">
+            BUSINESS OPPORTUNITY
+          </p>
+          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl tracking-widest text-[#F2F2F2] font-semibold">
+            BECOME A DISTRIBUTOR
+          </h2>
+          <div className="mt-6 mx-auto w-16 h-px bg-gold opacity-60" />
+          <p className="mt-6 text-sm text-[#B8B8B8] leading-relaxed font-light max-w-xl mx-auto">
+            Join the HydroElite network. We&apos;re expanding across Delhi-NCR
+            and looking for dedicated distribution partners. Attractive margins,
+            reliable supply, and brand support.
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          {distributorBenefits.map((benefit, i) => (
+            <motion.div
+              key={benefit.title}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, delay: i * 0.15 }}
+              className="p-6 border text-center"
+              style={{ borderColor: "#2A2B2E", background: "#111214" }}
+              data-ocid={`distributor.item.${i + 1}`}
+            >
+              <h3 className="text-xs tracking-widest text-gold font-semibold mb-3">
+                {benefit.title}
+              </h3>
+              <div className="w-8 h-px bg-gold opacity-40 mx-auto mb-4" />
+              <p className="text-[13px] text-[#B8B8B8] leading-relaxed font-light">
+                {benefit.desc}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="flex justify-center"
+        >
+          <a
+            href="https://wa.me/919990768012?text=I%20am%20interested%20in%20becoming%20a%20HydroElite%20distributor"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-3 bg-gold text-black text-xs tracking-widest px-10 py-4 hover:opacity-90 transition-all duration-300 font-semibold min-h-[44px]"
+            data-ocid="distributor.primary_button"
+          >
+            <WhatsAppIcon />
+            ENQUIRE ON WHATSAPP
+          </a>
+        </motion.div>
+      </div>
+      <div
+        className="absolute bottom-0 left-0 right-0 h-px"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, #C9A84C, transparent)",
+        }}
+      />
+    </section>
+  );
+}
+
 // ── Footer ────────────────────────────────────────────────────────────────────
 function Footer() {
   const year = new Date().getFullYear();
@@ -854,19 +1234,24 @@ function Footer() {
               </div>
             </div>
             <ul className="flex flex-col md:flex-row items-center gap-2 md:gap-6">
-              {["HOME", "OUR WATER", "PRODUCTS", "FOUNDER", "CONTACT"].map(
-                (link) => (
-                  <li key={link}>
-                    <a
-                      href={`#${link.toLowerCase().replace(" ", "-")}`}
-                      className="text-xs tracking-widest text-[#B8B8B8] hover:text-gold transition-colors min-h-[44px] flex items-center"
-                      data-ocid="footer.link"
-                    >
-                      {link}
-                    </a>
-                  </li>
-                ),
-              )}
+              {[
+                "HOME",
+                "OUR WATER",
+                "PRODUCTS",
+                "AVAILABILITY",
+                "FOUNDER",
+                "CONTACT",
+              ].map((link) => (
+                <li key={link}>
+                  <a
+                    href={`#${link.toLowerCase().replace(" ", "-")}`}
+                    className="text-xs tracking-widest text-[#B8B8B8] hover:text-gold transition-colors min-h-[44px] flex items-center"
+                    data-ocid="footer.link"
+                  >
+                    {link}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
           <div
@@ -1051,8 +1436,10 @@ export default function App() {
         <Hero />
         <Features />
         <Product />
+        <Availability />
         <Founder />
         <Contact />
+        <Distributor />
       </main>
       <Footer />
       <FloatingWhatsApp />
