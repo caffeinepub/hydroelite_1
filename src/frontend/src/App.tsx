@@ -505,24 +505,6 @@ const products: Product[] = [
     ],
   },
   {
-    id: "lemon",
-    image:
-      "/assets/uploads/chatgpt_image_mar_28_2026_12_58_56_pm-019d3359-2132-749c-ba8a-7a112c316cfc-1.png",
-    label: "500ml Bottle",
-    name: "HYDROELITE\nLEMON+",
-    tag: "FLAVOURED RANGE",
-    price: "₹40",
-    badge: null,
-    description:
-      "Premium packaged drinking water with added minerals and a refreshing lemon flavour. Processed through RO, UV and ozonization for purity and clean hydration.",
-    features: [
-      "pH 8+ Alkaline Water",
-      "Infused with Lemon Essence",
-      "Electrolytes Added",
-      "RO + UV + Ozonized",
-    ],
-  },
-  {
     id: "basic",
     image: "/assets/generated/hydroelite-basic-250ml.dim_1024x1024.png",
     label: "250ml Bottle",
@@ -1375,7 +1357,6 @@ function Contact() {
   );
 }
 
-// ── Footer ────────────────────────────────────────────────────────────────────
 function Footer() {
   const year = new Date().getFullYear();
   const hostname =
