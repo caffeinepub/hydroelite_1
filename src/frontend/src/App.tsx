@@ -490,7 +490,7 @@ type Product = {
 const products: Product[] = [
   {
     id: "premium",
-    image: "/assets/generated/hydroelite-ph8-black-crystal.dim_1024x1024.png",
+    image: "/assets/generated/hydroelite-ph8-ultra-luxury.dim_1024x1024.png",
     label: "500ml Bottle",
     name: "HYDROELITE\npH8+ ALKALINE",
     tag: "ALKALINE WATER",
@@ -731,7 +731,7 @@ function Product() {
               </div>
               <div className="flex-1 flex items-end justify-center overflow-hidden bg-[#0A0B0D] p-4">
                 <img
-                  src="/assets/generated/hydroelite-ph8-black-crystal.dim_1024x1024.png"
+                  src="/assets/generated/hydroelite-ph8-ultra-luxury.dim_1024x1024.png"
                   alt="HydroElite pH8+ Premium"
                   className="object-contain w-full"
                   style={{ maxHeight: "320px" }}
