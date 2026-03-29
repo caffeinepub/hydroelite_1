@@ -117,6 +117,51 @@ Email: officialhydroelite@gmail.com
 Phone/WhatsApp: +91 9990768012
 Instagram: @hydroelite_pvt`;
 
+// ─── Product Cards Data ───────────────────────────────────────────────────────
+const PRODUCT_CARDS = [
+  {
+    category: "EVERYDAY HYDRATION",
+    name: "HydroElite Basic",
+    size: "250ml Bottle",
+    price: "₹10",
+    priceBadgeColor: "#D4AF37",
+    accentBadge: "₹10 ONLY",
+    accentBadgeColor: "#3B82F6",
+    image: "/assets/generated/hydroelite-bottle-transparent.dim_600x900.png",
+    features: ["Packaged Drinking Water", "BIS Certified", "BPA-Free Bottle"],
+  },
+  {
+    category: "PURE PACKAGED WATER",
+    name: "HydroElite Packaged Water",
+    size: "500ml Bottle",
+    price: "₹20",
+    priceBadgeColor: "#D4AF37",
+    accentBadge: null,
+    accentBadgeColor: null,
+    image: "/assets/generated/hydroelite-bottle-transparent.dim_600x900.png",
+    features: [
+      "BIS Certified",
+      "Advanced Filtration",
+      "BPA-Free · Pure · Safe",
+    ],
+  },
+  {
+    category: "ALKALINE WATER",
+    name: "HydroElite pH8+",
+    size: "500ml Bottle",
+    price: "₹65",
+    priceBadgeColor: "#D4AF37",
+    accentBadge: "PREMIUM",
+    accentBadgeColor: "#D4AF37",
+    image: "/assets/generated/hydroelite-bulk-bottle.dim_800x1000.png",
+    features: [
+      "Alkaline pH 8.0–9.0",
+      "Electrolyte Enhanced",
+      "FSSAI & BIS Certified",
+    ],
+  },
+];
+
 // ─── Legal Modal ──────────────────────────────────────────────────────────────
 function LegalModal({
   trigger,
@@ -653,6 +698,86 @@ export default function App() {
                   className="relative z-10 max-h-[520px] w-auto object-contain bottle-glow"
                 />
               </div>
+            </Reveal>
+          </div>
+
+          {/* Product Cards Grid */}
+          <div className="mt-20">
+            <Reveal className="text-center mb-10">
+              <p className="text-xs tracking-[0.4em] text-[#D4AF37] uppercase font-semibold">
+                CHOOSE YOUR HYDRATION · ALL AVAILABLE FOR BULK ORDERS
+              </p>
+            </Reveal>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {PRODUCT_CARDS.map((product, i) => (
+                <Reveal
+                  key={product.name}
+                  delay={i * 100}
+                  className="group relative bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl overflow-hidden hover:border-[#D4AF37]/50 hover:shadow-xl hover:shadow-[#D4AF37]/10 transition-all duration-300 hover:-translate-y-1"
+                >
+                  {/* Accent badge at top */}
+                  {product.accentBadge && (
+                    <div className="absolute top-3 left-3 z-10">
+                      <span
+                        className="text-[10px] font-bold px-2.5 py-1 rounded-full tracking-widest uppercase text-white"
+                        style={{
+                          backgroundColor:
+                            product.accentBadgeColor ?? undefined,
+                        }}
+                      >
+                        {product.accentBadge}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Bottle image area */}
+                  <div className="relative bg-[#111] flex items-center justify-center h-56 overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#1a1a1a]/60" />
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="relative z-10 h-48 w-auto object-contain transition-transform duration-500 group-hover:scale-105"
+                    />
+                    {/* Gold price pill */}
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20">
+                      <span
+                        className="text-xs font-bold px-3 py-1.5 rounded-full text-black tracking-wider"
+                        style={{ backgroundColor: product.priceBadgeColor }}
+                      >
+                        {product.price}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Card content */}
+                  <div className="p-5">
+                    <p className="text-[10px] tracking-[0.3em] text-[#D4AF37] uppercase mb-1 font-semibold">
+                      {product.category}
+                    </p>
+                    <h3 className="font-display text-lg font-bold text-white mb-1 group-hover:text-[#D4AF37] transition-colors">
+                      {product.name}
+                    </h3>
+                    <p className="text-xs text-gray-500 mb-3">{product.size}</p>
+                    <ul className="space-y-1.5">
+                      {product.features.map((feat) => (
+                        <li
+                          key={feat}
+                          className="flex items-center gap-2 text-xs text-gray-400"
+                        >
+                          <span className="text-[#D4AF37] text-[10px]">◆</span>
+                          {feat}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+            <Reveal className="text-center mt-8" delay={300}>
+              <p className="text-xs text-gray-500">
+                ⚠️ Note: We accept bulk orders only. Single bottle purchases are
+                not available.
+              </p>
             </Reveal>
           </div>
         </div>
