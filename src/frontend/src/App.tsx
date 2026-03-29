@@ -1,1636 +1,1104 @@
-import { useActor } from "@/hooks/useActor";
-import { ChevronDown, Mail, MapPin, Menu, Phone, X } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useState } from "react";
-import { SiFacebook, SiInstagram, SiX } from "react-icons/si";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Toaster } from "@/components/ui/sonner";
+import { Textarea } from "@/components/ui/textarea";
+import { Loader2 } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import type { backendInterface as BackendWithFeedback } from "./backend.d";
+import { useActor } from "./hooks/useActor";
 
-// ── SVG Icons ──────────────────────────────────────────────────────────────
-function DropletIcon() {
-  return (
-    <svg
-      width="28"
-      height="28"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="#C9A84C"
-      strokeWidth="1.5"
-      role="img"
-      aria-label="Alkaline balance droplet icon"
-    >
-      <title>Alkaline Balance</title>
-      <path d="M12 2C6 10 4 14 4 16a8 8 0 0016 0c0-2-2-6-8-14z" />
-    </svg>
-  );
+// ─── Scroll reveal hook ───────────────────────────────────────────────────────
+function useInView(threshold = 0.12) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [threshold]);
+  return { ref, visible };
 }
 
-function WaveIcon() {
-  return (
-    <svg
-      width="28"
-      height="28"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="#C9A84C"
-      strokeWidth="1.5"
-      role="img"
-      aria-label="Hydration wave icon"
-    >
-      <title>Optimal Hydration</title>
-      <path d="M2 12c2-4 4-4 6 0s4 4 6 0 4-4 6 0" />
-      <path d="M2 17c2-4 4-4 6 0s4 4 6 0 4-4 6 0" />
-    </svg>
-  );
-}
-
-function ShieldIcon() {
-  return (
-    <svg
-      width="28"
-      height="28"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="#C9A84C"
-      strokeWidth="1.5"
-      role="img"
-      aria-label="Purity shield icon"
-    >
-      <title>Unmatched Purity</title>
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-    </svg>
-  );
-}
-
-function SparkleIcon() {
-  return (
-    <svg
-      width="28"
-      height="28"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="#C9A84C"
-      strokeWidth="1.5"
-      role="img"
-      aria-label="Minerals sparkle icon"
-    >
-      <title>Essential Minerals</title>
-      <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z" />
-    </svg>
-  );
-}
-
-function WhatsAppIcon() {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      role="img"
-      aria-label="WhatsApp"
-    >
-      <title>WhatsApp</title>
-      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-    </svg>
-  );
-}
-
-// ── Modal ─────────────────────────────────────────────────────────────────────
-function Modal({
-  title,
-  onClose,
+function Reveal({
   children,
-}: { title: string; onClose: () => void; children: React.ReactNode }) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
-    };
-  }, [onClose]);
-
+  delay = 0,
+  className = "",
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+}) {
+  const { ref, visible } = useInView();
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
-      onClick={onClose}
-      onKeyDown={(e) => {
-        if (e.key === "Escape") onClose();
-      }}
-      role="presentation"
+      ref={ref}
+      className={`section-reveal${visible ? " visible" : ""} ${className}`}
+      style={{ transitionDelay: `${delay}ms` }}
     >
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
-      <div
-        className="relative w-full max-w-2xl max-h-[85vh] flex flex-col border"
-        style={{ background: "#111214", borderColor: "#2A2B2E" }}
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.stopPropagation()}
-      >
-        <div
-          className="flex items-center justify-between px-6 py-5 border-b"
-          style={{ borderColor: "#2A2B2E" }}
-        >
-          <h2 className="font-display text-base tracking-widest text-gold font-semibold">
+      {children}
+    </div>
+  );
+}
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+const WA_LINK =
+  "https://wa.me/919990768012?text=Hi%2C%20I%20am%20interested%20in%20a%20bulk%20quote%20for%20HydroElite%20water.";
+
+const NAV_ITEMS = [
+  { label: "Who We Serve", href: "#who-we-serve" },
+  { label: "Why Us", href: "#why-us" },
+  { label: "Products", href: "#products" },
+  { label: "Bulk Orders", href: "#bulk-orders" },
+  { label: "Branding", href: "#branding" },
+];
+
+const PRIVACY_POLICY = `HydroElite Privacy Policy
+
+Last updated: March 2026
+
+HydroElite Beverages is committed to protecting your privacy. This policy outlines how we collect and use information.
+
+1. Information We Collect: When you contact us for bulk orders, we may collect your name, organization name, phone number, and email address solely for order processing and communication.
+
+2. How We Use Your Information: We use your contact details to respond to bulk order inquiries, process orders, and send relevant business communications.
+
+3. Data Protection: We do not sell, trade, or transfer your information to third parties. Your data is stored securely and used only for business purposes.
+
+4. Contact: For any privacy concerns, email us at officialhydroelite@gmail.com`;
+
+const TERMS_CONDITIONS = `HydroElite Terms & Conditions
+
+1. Bulk Orders Only: HydroElite exclusively accepts bulk institutional orders. We do not sell single bottles or retail quantities.
+
+2. Minimum Order: Minimum order quantity is 100 bottles.
+
+3. Pricing: All pricing is subject to change without notice. Final pricing is confirmed upon receipt of a formal bulk quote request.
+
+4. Payment Terms: 50% advance payment required for all bulk orders. Balance due before dispatch unless otherwise agreed.
+
+5. Delivery: Delivery timelines vary based on order volume and location within Delhi NCR.
+
+6. Quality: Every batch is tested to maintain pH 8.0-9.0 alkalinity standards. Quality certificates available on request.
+
+7. Cancellations: Bulk orders once confirmed and in production cannot be cancelled.
+
+8. Jurisdiction: Disputes subject to Delhi NCR jurisdiction.`;
+
+const ABOUT_US = `About HydroElite
+
+HydroElite is a premium alkaline water brand based in New Delhi, India, dedicated to supplying high-quality hydration solutions to institutions, events, and corporate entities across Delhi NCR.
+
+Our Mission: To provide consistently superior alkaline water that meets the highest quality standards, exclusively through bulk institutional supply.
+
+What We Do: We supply premium pH 8.0-9.0 alkaline water in premium black-label 500ml bottles to events, weddings, corporate offices, gyms, fitness centers, hotels, cafes, and distributors.
+
+Why Bulk Only: Our focus on bulk supply allows us to ensure every bottle meets our rigorous quality standards while offering competitive pricing to our institutional partners.
+
+Location: New Friends Colony, New Delhi - 110025
+Email: officialhydroelite@gmail.com
+Phone/WhatsApp: +91 9990768012
+Instagram: @hydroelite_pvt`;
+
+// ─── Legal Modal ──────────────────────────────────────────────────────────────
+function LegalModal({
+  trigger,
+  title,
+  content,
+}: {
+  trigger: React.ReactNode;
+  title: string;
+  content: string;
+}) {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogContent className="max-w-lg bg-[#111] border border-[#D4AF37]/30 text-white max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="font-display text-[#D4AF37] text-xl">
             {title}
-          </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-[#B8B8B8] hover:text-gold transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
-            aria-label="Close"
-          >
-            <X size={18} />
-          </button>
-        </div>
-        <div className="overflow-y-auto px-6 py-6 text-[#B8B8B8] text-sm leading-relaxed space-y-5">
-          {children}
-        </div>
-      </div>
-    </div>
+          </DialogTitle>
+        </DialogHeader>
+        <pre className="text-sm text-gray-300 whitespace-pre-wrap font-sans leading-relaxed">
+          {content}
+        </pre>
+      </DialogContent>
+    </Dialog>
   );
 }
 
-// ── Floating WhatsApp Button (mobile only) ─────────────────────────────────
-function FloatingWhatsApp() {
-  return (
-    <a
-      href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20water"
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="Order on WhatsApp"
-      className="lg:hidden fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 rounded-full shadow-lg"
-      style={{ background: "#C9A84C" }}
-      data-ocid="whatsapp.primary_button"
-    >
-      <WhatsAppIcon />
-    </a>
-  );
-}
-
-// ── Navbar ──────────────────────────────────────────────────────────────────
-function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  const navLinks = [
-    { label: "HOME", href: "#hero" },
-    { label: "OUR WATER", href: "#features" },
-    { label: "PRODUCTS", href: "#products" },
-    { label: "AVAILABILITY", href: "#availability" },
-    { label: "FOUNDER", href: "#founder" },
-    { label: "CONTACT", href: "#contact" },
-  ];
-
-  return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? "bg-black/90 backdrop-blur-md shadow-lg" : "bg-transparent"}`}
-      style={{ borderBottom: scrolled ? "1px solid #2A2B2E" : "none" }}
-    >
-      <nav className="max-w-7xl mx-auto px-6 lg:px-10 h-16 md:h-20 flex items-center justify-between">
-        <a
-          href="#hero"
-          className="font-display text-xl md:text-2xl tracking-widest font-semibold text-gold min-h-[44px] flex items-center"
-          data-ocid="nav.link"
-        >
-          HYDROELITE
-        </a>
-        <ul className="hidden lg:flex items-center gap-6">
-          {navLinks.map((link) => (
-            <li key={link.href}>
-              <a
-                href={link.href}
-                className="text-xs tracking-widest text-[#B8B8B8] hover:text-gold transition-colors duration-200 font-medium min-h-[44px] flex items-center"
-                data-ocid="nav.link"
-              >
-                {link.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-        <div className="hidden lg:flex items-center gap-3">
-          <a
-            href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20water"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 border border-gold text-gold text-xs tracking-widest px-5 py-2.5 hover:bg-gold hover:text-black transition-all duration-300 min-h-[44px]"
-            data-ocid="nav.primary_button"
-          >
-            ORDER NOW
-          </a>
-        </div>
-        <button
-          className="lg:hidden text-gold p-2 min-h-[44px] min-w-[44px] flex items-center justify-center"
-          onClick={() => setMenuOpen((v) => !v)}
-          aria-label="Toggle menu"
-          data-ocid="nav.toggle"
-          type="button"
-        >
-          {menuOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
-      </nav>
-
-      <AnimatePresence>
-        {menuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="lg:hidden bg-black/95 backdrop-blur-md border-t border-[#2A2B2E] px-6 py-6"
-          >
-            <ul className="flex flex-col gap-4">
-              {navLinks.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    onClick={() => setMenuOpen(false)}
-                    className="text-sm tracking-widest text-[#B8B8B8] hover:text-gold transition-colors min-h-[44px] flex items-center"
-                    data-ocid="nav.link"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-              <li className="pt-2">
-                <a
-                  href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20water"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => setMenuOpen(false)}
-                  className="flex items-center justify-center border border-gold text-gold text-xs tracking-widest px-5 py-3 hover:bg-gold hover:text-black transition-all w-full min-h-[44px]"
-                  data-ocid="nav.primary_button"
-                >
-                  ORDER NOW
-                </a>
-              </li>
-            </ul>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
-  );
-}
-
-// ── Hero ─────────────────────────────────────────────────────────────────────
-function Hero() {
-  return (
-    <section
-      id="hero"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
-      data-ocid="hero.section"
-    >
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage:
-            "url('/assets/generated/hero-water-bg.dim_1920x1080.jpg')",
-        }}
-      />
-      <div
-        className="absolute inset-0"
-        style={{ background: "rgba(0,0,0,0.65)" }}
-      />
-      <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, ease: "easeOut" }}
-        >
-          <p className="text-xs tracking-ultra text-gold mb-4 md:mb-8 font-sans">
-            PREMIUM WATER
-          </p>
-          <h1 className="font-display text-3xl sm:text-5xl md:text-8xl lg:text-[7rem] xl:text-[8rem] leading-none tracking-widest font-bold text-gold mb-4 md:mb-6">
-            HYDROELITE
-          </h1>
-        </motion.div>
-        <motion.p
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
-          className="text-sm md:text-xl font-light tracking-widest text-[#B8B8B8] mb-8 md:mb-14"
-        >
-          Pure Hydration. Elite Performance.
-        </motion.p>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.7, ease: "easeOut" }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4"
-        >
-          <a
-            href="#products"
-            className="w-full sm:w-auto border border-gold text-gold text-xs tracking-widest px-10 py-4 hover:bg-gold hover:text-black transition-all duration-300 font-medium text-center min-h-[44px] flex items-center justify-center"
-            data-ocid="hero.primary_button"
-          >
-            EXPLORE THE ELITE
-          </a>
-          <a
-            href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20water"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full sm:w-auto flex items-center justify-center gap-2 text-xs tracking-widest px-10 py-4 font-semibold min-h-[44px] transition-all duration-300"
-            style={{ background: "#25D366", color: "#fff" }}
-            data-ocid="hero.secondary_button"
-          >
-            <WhatsAppIcon />
-            ORDER ON WHATSAPP
-          </a>
-        </motion.div>
-      </div>
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
-        <div className="w-px h-16 bg-gradient-to-b from-gold to-transparent opacity-60" />
-      </div>
-    </section>
-  );
-}
-
-// ── Features ──────────────────────────────────────────────────────────────────
-const features = [
-  {
-    icon: <DropletIcon />,
-    title: "ALKALINE BALANCE",
-    desc: "High pH 8.5+ for optimal body balance and peak metabolic performance.",
-  },
-  {
-    icon: <WaveIcon />,
-    title: "OPTIMAL HYDRATION",
-    desc: "Enhanced molecular structure for faster cellular absorption.",
-  },
-  {
-    icon: <ShieldIcon />,
-    title: "UNMATCHED PURITY",
-    desc: "7-stage filtration process removing 99.99% of contaminants.",
-  },
-  {
-    icon: <SparkleIcon />,
-    title: "ESSENTIAL MINERALS",
-    desc: "Naturally sourced trace minerals for complete nourishment.",
-  },
-];
-
-function Features() {
-  return (
-    <section
-      id="features"
-      className="py-16 md:py-24"
-      style={{ background: "#111214" }}
-      data-ocid="features.section"
-    >
-      <div className="max-w-7xl mx-auto px-6 lg:px-10">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.9 }}
-          className="text-center mb-12 md:mb-20"
-        >
-          <p className="text-xs tracking-ultra text-gold mb-4">
-            EXCELLENCE IN EVERY DROP
-          </p>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl tracking-widest text-[#F2F2F2] font-semibold">
-            THE HYDROELITE DIFFERENCE
-          </h2>
-          <div className="mt-6 mx-auto w-16 h-px bg-gold opacity-60" />
-        </motion.div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0">
-          {features.map((f, i) => (
-            <motion.div
-              key={f.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.7, delay: i * 0.12 }}
-              className="relative px-8 py-10 text-center group"
-              style={{
-                borderLeft: i % 2 !== 0 ? "1px solid #2A2B2E" : undefined,
-                borderTop: "1px solid #2A2B2E",
-              }}
-              data-ocid={`features.item.${i + 1}`}
-            >
-              <div className="mb-5 flex justify-center">
-                <div className="p-3 border border-[#2A2B2E] group-hover:border-gold transition-colors duration-300">
-                  {f.icon}
-                </div>
-              </div>
-              <h3 className="text-xs tracking-widest text-[#F2F2F2] font-semibold mb-3">
-                {f.title}
-              </h3>
-              <p className="text-[13px] text-[#B8B8B8] leading-relaxed font-light">
-                {f.desc}
-              </p>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── FSSAI Trust Strip ─────────────────────────────────────────────────────────
-function TrustStrip() {
-  const items = [
-    { icon: "🛡️", label: "FSSAI Licensed" },
-    { icon: "✅", label: "BIS Certified" },
-  ];
-  return (
-    <div
-      className="w-full py-3 px-4"
-      style={{
-        background: "#111214",
-        borderBottom: "1px solid #2A2B2E",
-        borderTop: "1px solid #2A2B2E",
-      }}
-    >
-      <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-center gap-4 md:gap-0">
-        {items.map((item, i) => (
-          <div key={item.label} className="flex items-center gap-2">
-            {i > 0 && (
-              <span
-                className="hidden md:block w-1 h-1 rounded-full mx-4"
-                style={{ background: "#C9A84C" }}
-              />
-            )}
-            <span className="text-base">{item.icon}</span>
-            <span
-              className="text-xs tracking-widest font-medium"
-              style={{ color: "#C9A84C" }}
-            >
-              {item.label}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ── Product Card ──────────────────────────────────────────────────────────────
-type Product = {
-  id: string;
-  image: string;
-  label: string;
-  name: string;
-  tag: string;
-  price: string;
-  badge: string | null;
-  badgeColor?: string;
-  description: string;
-  features: string[];
-};
-
-const products: Product[] = [
-  {
-    id: "premium",
-    image: "/assets/generated/hydroelite-ph8-ultra-luxury.dim_1024x1024.png",
-    label: "500ml Bottle",
-    name: "HYDROELITE\npH8+ ALKALINE",
-    tag: "ALKALINE WATER",
-    price: "₹65",
-    badge: null,
-    description: "",
-    features: [
-      "pH 8.5+ Certified Alkaline",
-      "7-Stage Filtration Process",
-      "BPA-Free Premium Bottle",
-      "Naturally Sourced Minerals",
-    ],
-  },
-  {
-    id: "basic",
-    image: "/assets/generated/hydroelite-basic-250ml.dim_1024x1024.png",
-    label: "250ml Bottle",
-    name: "HYDROELITE\nBASIC",
-    tag: "EVERYDAY HYDRATION",
-    price: "₹10",
-    badge: "₹10 ONLY",
-    badgeColor: "blue",
-    description:
-      "Pure, safe, and refreshing packaged drinking water. Processed through advanced filtration for clean hydration every time. Perfect for daily use, travel, and on-the-go.",
-    features: [
-      "BIS Certified Packaged Water",
-      "Advanced Filtration Process",
-      "BPA-Free Bottle",
-      "Pure • Safe • Refreshing",
-    ],
-  },
-  {
-    id: "premium20",
-    image: "/assets/generated/hydroelite-premium-500ml.dim_1024x1024.png",
-    label: "500ml Bottle",
-    name: "HYDROELITE\nPACKAGED WATER",
-    tag: "PURE PACKAGED WATER",
-    price: "₹20",
-    badge: null,
-    badgeColor: "gold",
-    description:
-      "Pure, safe, and refreshing BIS certified packaged water. Processed through advanced filtration for clean, safe hydration every time.",
-    features: [
-      "BIS Certified Packaged Water",
-      "Advanced Filtration Process",
-      "BPA-Free Bottle",
-      "Pure • Safe • Refreshing",
-    ],
-  },
-];
-
-function ProductCard({ product, index }: { product: Product; index: number }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.8, delay: index * 0.15, ease: "easeOut" }}
-      className="flex flex-col border h-full"
-      style={{ borderColor: "#2A2B2E", background: "#0D0D0F" }}
-      data-ocid={`products.item.${index + 1}`}
-    >
-      {/* Image */}
-      <div
-        className="relative flex items-center justify-center py-10 px-6"
-        style={{
-          background: "linear-gradient(180deg, #111214 0%, #0B0B0C 100%)",
-          borderBottom: "1px solid #2A2B2E",
-        }}
-      >
-        {product.id !== "basic" && (
-          <div
-            className="absolute inset-0 opacity-20"
-            style={{
-              background:
-                "radial-gradient(ellipse at 50% 70%, #C9A84C 0%, transparent 65%)",
-            }}
-          />
-        )}
-        {product.badge && (
-          <div
-            className="absolute top-3 right-3 z-10 px-2.5 py-1 text-[10px] font-bold tracking-widest uppercase"
-            style={
-              product.badgeColor === "gold"
-                ? { background: "#C9A84C", color: "#000" }
-                : { background: "#1E6FD9", color: "#fff" }
-            }
-          >
-            {product.badge}
-          </div>
-        )}
-        <img
-          src={product.image}
-          alt={product.name.replace("\n", " ")}
-          className="relative bottle-glow max-h-56 md:max-h-72 w-auto object-contain"
-        />
-        {product.id === "premium20" && (
-          <div
-            className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-sm font-bold tracking-widest z-10"
-            style={{
-              background: "rgba(0,0,0,0.75)",
-              color: "#C9A84C",
-              border: "1px solid #C9A84C",
-            }}
-          >
-            ₹20
-          </div>
-        )}
-      </div>
-
-      {/* Content */}
-      <div className="flex flex-col flex-1 p-6 md:p-8 gap-4">
-        <div>
-          <p className="text-xs tracking-ultra text-gold mb-2">{product.tag}</p>
-          <h3 className="font-display text-xl md:text-2xl tracking-widest text-[#F2F2F2] font-semibold leading-tight whitespace-pre-line">
-            {product.name}
-          </h3>
-        </div>
-        <div className="w-8 h-px bg-gold opacity-50" />
-        <p className="text-[#B8B8B8] text-xs tracking-widest font-light">
-          {product.label}
-        </p>
-        {product.description && (
-          <p className="text-[#B8B8B8] text-[13px] leading-relaxed font-light">
-            {product.description}
-          </p>
-        )}
-        <p className="font-display text-3xl md:text-4xl text-gold font-bold tracking-wide">
-          {product.price}
-        </p>
-        <ul className="flex flex-col gap-2 text-[13px] text-[#B8B8B8]">
-          {product.features.map((item) => (
-            <li key={item} className="flex items-center gap-3">
-              <div className="w-1 h-1 rounded-full bg-gold flex-shrink-0" />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-        <div className="mt-auto pt-4">
-          <a
-            href="https://wa.me/919990768012?text=I%20want%20to%20order%20HydroElite%20water"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full flex items-center justify-center gap-3 bg-gold text-black text-xs tracking-widest px-6 py-4 hover:opacity-90 transition-all duration-300 font-semibold min-h-[44px]"
-            data-ocid={`products.primary_button.${index + 1}`}
-          >
-            <WhatsAppIcon />
-            ORDER ON WHATSAPP
-          </a>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-// ── Product Section ───────────────────────────────────────────────────────────
-function Product() {
-  return (
-    <section
-      id="products"
-      className="py-16 md:py-24 relative overflow-hidden"
-      style={{
-        background:
-          "linear-gradient(135deg, #0B0B0C 0%, #111214 50%, #0B0B0C 100%)",
-      }}
-      data-ocid="products.section"
-    >
-      <div
-        className="absolute top-0 left-0 right-0 h-px"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, #C9A84C, transparent)",
-        }}
-      />
-      <div className="max-w-7xl mx-auto px-6 lg:px-10">
-        {/* Trust Strip */}
-        <TrustStrip />
-
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.9 }}
-          className="text-center mb-12 md:mb-16 mt-12"
-        >
-          <p className="text-xs tracking-ultra text-gold mb-4">
-            OUR COLLECTION
-          </p>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl tracking-widest text-[#F2F2F2] font-semibold">
-            PRODUCT SHOWCASE
-          </h2>
-          <div className="mt-6 mx-auto w-16 h-px bg-gold opacity-60" />
-        </motion.div>
-
-        {/* Product Comparison */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.9 }}
-          className="mb-12 md:mb-16"
-        >
-          <div
-            className="relative overflow-hidden border"
-            style={{ borderColor: "#2A2B2E" }}
-          >
-            {/* Labels */}
-            <div className="absolute top-4 left-0 right-0 z-10 flex justify-around px-8 pointer-events-none">
-              <div className="flex flex-col items-center gap-1">
-                <span className="bg-blue-600 text-white text-[10px] tracking-widest px-3 py-1 font-semibold">
-                  BASIC
-                </span>
-                <span className="text-[#B8B8B8] text-[10px] tracking-widest">
-                  ₹10 · 250ml
-                </span>
-              </div>
-              <div className="flex flex-col items-center gap-1">
-                <span
-                  className="text-[10px] tracking-widest px-3 py-1 font-semibold"
-                  style={{ background: "#C9A84C", color: "#000" }}
-                >
-                  pH8+ PREMIUM
-                </span>
-                <span className="text-[#B8B8B8] text-[10px] tracking-widest">
-                  ₹65 · 500ml
-                </span>
-              </div>
-            </div>
-            <div className="flex w-full" style={{ minHeight: "340px" }}>
-              <div className="flex-1 flex items-end justify-center overflow-hidden bg-[#0A0B0D] p-4">
-                <img
-                  src="/assets/generated/hydroelite-basic-250ml.dim_1024x1024.png"
-                  alt="HydroElite Basic"
-                  className="object-contain w-full"
-                  style={{ maxHeight: "320px" }}
-                />
-              </div>
-              <div className="flex-1 flex items-end justify-center overflow-hidden bg-[#0A0B0D] p-4">
-                <img
-                  src="/assets/generated/hydroelite-ph8-ultra-luxury.dim_1024x1024.png"
-                  alt="HydroElite pH8+ Premium"
-                  className="object-contain w-full"
-                  style={{ maxHeight: "320px" }}
-                />
-              </div>
-            </div>
-            {/* Center divider line */}
-            <div
-              className="absolute inset-y-0 left-1/2 w-px opacity-40"
-              style={{ background: "#C9A84C" }}
-            />
-          </div>
-          <p className="text-center text-[11px] tracking-widest text-[#B8B8B8] mt-4">
-            CHOOSE YOUR HYDRATION · BOTH AVAILABLE ACROSS SOUTH DELHI
-          </p>
-        </motion.div>
-
-        {/* Product Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch">
-          {products.map((product, i) => (
-            <ProductCard key={product.id} product={product} index={i} />
-          ))}
-        </div>
-      </div>
-      <div
-        className="absolute bottom-0 left-0 right-0 h-px"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, #C9A84C, transparent)",
-        }}
-      />
-    </section>
-  );
-}
-
-// ── Availability Section ──────────────────────────────────────────────────────
-const southDelhiAreas = [
-  "New Friends Colony",
-  "Greater Kailash",
-  "Saket",
-  "Hauz Khas",
-  "Lajpat Nagar",
-  "Nehru Place",
-  "Malviya Nagar",
-  "Vasant Kunj",
-  "Defence Colony",
-  "South Extension",
-];
-
-function Availability() {
-  return (
-    <section
-      id="availability"
-      className="py-16 md:py-24 relative overflow-hidden"
-      style={{ background: "#111214" }}
-      data-ocid="availability.section"
-    >
-      <div
-        className="absolute top-0 left-0 right-0 h-px"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, #C9A84C, transparent)",
-        }}
-      />
-      <div className="max-w-5xl mx-auto px-6 lg:px-10">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.9 }}
-          className="text-center mb-10 md:mb-16"
-        >
-          <p className="text-xs tracking-ultra text-gold mb-4">
-            SERVING SOUTH DELHI
-          </p>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl tracking-widest text-[#F2F2F2] font-semibold">
-            AVAILABLE NEAR YOU
-          </h2>
-          <div className="mt-6 mx-auto w-16 h-px bg-gold opacity-60" />
-          <p className="mt-6 text-sm text-[#B8B8B8] leading-relaxed font-light max-w-xl mx-auto">
-            Same-day delivery across South Delhi. Order now and get fresh
-            HydroElite water at your doorstep.
-          </p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="flex flex-wrap justify-center gap-3 mb-10"
-        >
-          {southDelhiAreas.map((area, i) => (
-            <motion.span
-              key={area}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: i * 0.06 }}
-              className="px-4 py-2 text-xs tracking-widest font-medium border"
-              style={{
-                borderColor: "#C9A84C",
-                color: "#C9A84C",
-                background: "#0B0B0C",
-              }}
-              data-ocid={`availability.item.${i + 1}`}
-            >
-              {area}
-            </motion.span>
-          ))}
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="flex justify-center"
-        >
-          <a
-            href="https://wa.me/919990768012?text=I%20want%20to%20check%20delivery%20availability%20in%20my%20area"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-3 bg-gold text-black text-xs tracking-widest px-10 py-4 hover:opacity-90 transition-all duration-300 font-semibold min-h-[44px]"
-            data-ocid="availability.primary_button"
-          >
-            <WhatsAppIcon />
-            CHECK YOUR AREA
-          </a>
-        </motion.div>
-      </div>
-      <div
-        className="absolute bottom-0 left-0 right-0 h-px"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, #C9A84C, transparent)",
-        }}
-      />
-    </section>
-  );
-}
-
-// ── Founder ───────────────────────────────────────────────────────────────────
-function Founder() {
-  return (
-    <section
-      id="founder"
-      className="py-16 md:py-28 relative overflow-hidden"
-      style={{ background: "#0B0B0C" }}
-      data-ocid="founder.section"
-    >
-      <div
-        className="absolute top-0 left-0 right-0 h-px"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, #C9A84C, transparent)",
-        }}
-      />
-      <div className="max-w-7xl mx-auto px-6 lg:px-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-12 md:mb-20"
-        >
-          <p className="text-xs tracking-ultra text-gold mb-4">
-            THE MIND BEHIND THE BRAND
-          </p>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl tracking-widest text-[#F2F2F2] font-semibold">
-            MEET THE FOUNDER
-          </h2>
-          <div className="mt-6 mx-auto w-16 h-px bg-gold opacity-60" />
-        </motion.div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            className="flex justify-center lg:justify-end"
-          >
-            <div className="relative">
-              <div
-                className="absolute -inset-4 blur-2xl opacity-20"
-                style={{
-                  background:
-                    "radial-gradient(ellipse at center, #C9A84C 0%, transparent 70%)",
-                }}
-              />
-              <div
-                className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 z-10"
-                style={{ borderColor: "#C9A84C" }}
-              />
-              <div
-                className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 z-10"
-                style={{ borderColor: "#C9A84C" }}
-              />
-              <div
-                className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 z-10"
-                style={{ borderColor: "#C9A84C" }}
-              />
-              <div
-                className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 z-10"
-                style={{ borderColor: "#C9A84C" }}
-              />
-              <div className="relative overflow-hidden max-w-[320px] md:max-w-[380px]">
-                <img
-                  src="/assets/uploads/img_0997-019d2fb0-03ad-713a-9c03-d47e194d3583-1.jpeg"
-                  alt="Mohammed Asif Zardari — Founder & Visionary, Hydroelite"
-                  className="relative w-full object-cover block"
-                  style={{ filter: "brightness(0.85) contrast(1.05)" }}
-                  data-ocid="founder.card"
-                />
-                <div
-                  className="absolute inset-0 pointer-events-none"
-                  style={{
-                    background:
-                      "linear-gradient(to bottom, transparent 60%, #0B0B0C 100%)",
-                  }}
-                />
-              </div>
-            </div>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
-            className="flex flex-col gap-6"
-          >
-            <div>
-              <h3 className="font-display text-2xl md:text-3xl lg:text-4xl tracking-widest text-[#F2F2F2] font-semibold leading-tight">
-                MOHAMMED ASIF ZARDARI
-              </h3>
-              <p className="text-xs tracking-ultra text-gold mt-3">
-                FOUNDER & VISIONARY, HYDROELITE
-              </p>
-            </div>
-            <div className="w-12 h-px bg-gold opacity-50" />
-            <div className="flex flex-col gap-4 text-[#B8B8B8] text-sm leading-relaxed font-light">
-              <p>
-                Hydroelite was created with a vision to redefine the way people
-                experience water.
-              </p>
-              <p>
-                As someone who values health and performance, I realized that
-                hydration is often overlooked.
-              </p>
-              <p>
-                This brand represents a mindset — to never settle for average.
-              </p>
-            </div>
-            <motion.blockquote
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.5 }}
-              className="border-l-2 pl-5 py-1"
-              style={{ borderColor: "#C9A84C" }}
-            >
-              <p className="font-display text-base md:text-lg text-gold italic tracking-wide leading-relaxed">
-                &ldquo;Hydration is not just a need &mdash; it&apos;s a
-                standard.&rdquo;
-              </p>
-            </motion.blockquote>
-            <div className="flex flex-col sm:flex-row gap-4 mt-2">
-              <a
-                href="https://wa.me/919958740711?text=Hello%20Mohammed%20Asif%2C%20I%20would%20like%20to%20connect%20with%20you%20regarding%20Hydroelite"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto flex items-center justify-center gap-3 bg-gold text-black text-xs tracking-widest px-8 py-4 hover:opacity-90 transition-all duration-300 font-semibold min-h-[44px]"
-                data-ocid="founder.primary_button"
-              >
-                <WhatsAppIcon />
-                MESSAGE FOUNDER
-              </a>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-      <div
-        className="absolute bottom-0 left-0 right-0 h-px"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, #C9A84C, transparent)",
-        }}
-      />
-    </section>
-  );
-}
-
-// ── Feedback ──────────────────────────────────────────────────────────────────
-function Feedback() {
-  const [open, setOpen] = useState(false);
+// ─── Feedback Modal ───────────────────────────────────────────────────────────
+function FeedbackModal() {
   const { actor } = useActor();
-  const [rating, setRating] = useState(0);
-  const [hoverRating, setHoverRating] = useState(0);
+  const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
+  const [rating, setRating] = useState(5);
   const [message, setMessage] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    try {
-      await (actor as unknown as BackendWithFeedback)?.submitFeedback({
-        name,
-        rating: BigInt(rating),
-        message,
-        timestamp: BigInt(Date.now()),
-      });
-    } catch (_) {
-      // silently fail — feedback still shows success to user
+  const handleSubmit = useCallback(async () => {
+    if (!name.trim() || !message.trim()) {
+      toast.error("Please fill in all fields.");
+      return;
     }
-    setSubmitted(true);
-    setTimeout(() => {
+    setSubmitting(true);
+    try {
+      if (actor) {
+        await (actor as unknown as BackendWithFeedback).submitFeedback({
+          name,
+          rating: BigInt(rating),
+          message,
+          timestamp: BigInt(Date.now()),
+        });
+      }
+      toast.success("Thank you for your feedback!");
       setOpen(false);
-      setSubmitted(false);
       setName("");
       setMessage("");
-      setRating(0);
-      setHoverRating(0);
-    }, 2000);
-  }
-
-  function handleClose() {
-    setOpen(false);
-    setSubmitted(false);
-    setName("");
-    setMessage("");
-    setRating(0);
-    setHoverRating(0);
-  }
+      setRating(5);
+    } catch {
+      toast.error("Failed to submit. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  }, [actor, name, rating, message]);
 
   return (
-    <section
-      id="feedback"
-      className="py-20 md:py-28"
-      style={{ background: "#0B0B0C" }}
-      data-ocid="feedback.section"
-    >
-      <div className="max-w-xl mx-auto px-4 text-center">
-        <p
-          className="text-xs tracking-[0.3em] uppercase mb-3"
-          style={{ color: "#B8953F" }}
-        >
-          Feedback
-        </p>
-        <h2
-          className="text-2xl md:text-4xl font-bold tracking-[0.15em] uppercase mb-3"
-          style={{ color: "#D4AF5A", fontFamily: "Playfair Display, serif" }}
-        >
-          Share Your Experience
-        </h2>
-        <div
-          className="w-16 h-px mx-auto mb-5"
-          style={{
-            background:
-              "linear-gradient(90deg, transparent, #D4AF5A, transparent)",
-          }}
-        />
-        <p className="text-sm mb-8" style={{ color: "#A0A0A0" }}>
-          We&apos;d love to hear from you
-        </p>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
         <button
           type="button"
           data-ocid="feedback.open_modal_button"
-          onClick={() => setOpen(true)}
-          className="px-8 py-3 text-sm font-semibold tracking-widest uppercase transition-all duration-300"
-          style={{
-            background: "linear-gradient(135deg, #D4AF5A, #B8953F)",
-            color: "#0B0B0C",
-            border: "none",
-            borderRadius: "2px",
-            letterSpacing: "0.15em",
-            cursor: "pointer",
-          }}
+          className="text-xs text-gray-500 hover:text-[#D4AF37] transition-colors underline underline-offset-2"
         >
-          Give Feedback
+          Submit Feedback
         </button>
+      </DialogTrigger>
+      <DialogContent
+        data-ocid="feedback.dialog"
+        className="max-w-md bg-[#111] border border-[#D4AF37]/30 text-white"
+      >
+        <DialogHeader>
+          <DialogTitle className="font-display text-[#D4AF37] text-xl">
+            Share Your Feedback
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 mt-2">
+          <div>
+            <label
+              htmlFor="fb-name"
+              className="text-xs text-gray-400 uppercase tracking-wider block mb-1"
+            >
+              Your Name
+            </label>
+            <Input
+              id="fb-name"
+              data-ocid="feedback.input"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-600"
+              placeholder="Enter your name"
+            />
+          </div>
+          <div>
+            <p className="text-xs text-gray-400 uppercase tracking-wider block mb-1">
+              Rating (1–5)
+            </p>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((n) => (
+                <button
+                  type="button"
+                  key={n}
+                  onClick={() => setRating(n)}
+                  className={`w-9 h-9 rounded border text-sm font-medium transition-colors ${
+                    rating >= n
+                      ? "border-[#D4AF37] bg-[#D4AF37]/20 text-[#D4AF37]"
+                      : "border-[#2a2a2a] text-gray-500 hover:border-[#D4AF37]/40"
+                  }`}
+                >
+                  {n}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label
+              htmlFor="fb-message"
+              className="text-xs text-gray-400 uppercase tracking-wider block mb-1"
+            >
+              Message
+            </label>
+            <Textarea
+              id="fb-message"
+              data-ocid="feedback.textarea"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              className="bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-600 resize-none"
+              rows={3}
+              placeholder="Share your experience or thoughts..."
+            />
+          </div>
+          <Button
+            data-ocid="feedback.submit_button"
+            onClick={handleSubmit}
+            disabled={submitting}
+            className="w-full bg-[#D4AF37] hover:bg-[#e8cb6a] text-black font-semibold"
+          >
+            {submitting ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              "Submit Feedback"
+            )}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ─── Main App ─────────────────────────────────────────────────────────────────
+export default function App() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handler = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", handler, { passive: true });
+    return () => window.removeEventListener("scroll", handler);
+  }, []);
+
+  const scrollTo = (href: string) => {
+    setMobileMenuOpen(false);
+    const el = document.querySelector(href);
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+  };
+
+  return (
+    <div className="min-h-screen bg-[#0a0a0a] text-white">
+      <Toaster theme="dark" />
+
+      {/* Announcement Bar */}
+      <div className="bg-[#D4AF37] text-black text-center text-xs sm:text-sm font-bold py-2 px-4 tracking-wide">
+        🚫 Bulk Orders Only – We Do Not Sell Single Bottles
       </div>
 
-      {open && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center px-4"
-          style={{ background: "rgba(0,0,0,0.85)" }}
-          data-ocid="feedback.modal"
-        >
-          <div
-            className="relative w-full max-w-md p-8 rounded-lg"
-            style={{
-              background: "#111214",
-              border: "1px solid rgba(212,175,90,0.4)",
-              boxShadow: "0 0 40px rgba(212,175,90,0.1)",
-            }}
-          >
-            <button
-              type="button"
-              data-ocid="feedback.close_button"
-              onClick={handleClose}
-              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-lg transition-opacity"
-              style={{
-                color: "#D4AF5A",
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-              }}
-              aria-label="Close feedback form"
-            >
-              ✕
-            </button>
+      {/* Sticky Nav */}
+      <header
+        className={`sticky top-0 z-50 transition-all duration-300 border-b border-[#D4AF37]/10 ${
+          scrolled
+            ? "bg-[#0a0a0a]/95 backdrop-blur-md shadow-lg shadow-black/50"
+            : "bg-[#0a0a0a]/80 backdrop-blur-sm"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-3">
+              <span className="font-display text-xl sm:text-2xl font-bold text-[#D4AF37] tracking-wider">
+                HydroElite
+              </span>
+              <span className="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-widest uppercase border border-[#D4AF37]/40 text-[#D4AF37]/80">
+                Bulk Only
+              </span>
+            </div>
 
-            {submitted ? (
-              <div className="text-center py-8">
-                <div className="text-4xl mb-4" style={{ color: "#D4AF5A" }}>
-                  ✓
+            <nav className="hidden lg:flex items-center gap-6">
+              {NAV_ITEMS.map((item) => (
+                <button
+                  type="button"
+                  key={item.href}
+                  data-ocid="nav.link"
+                  onClick={() => scrollTo(item.href)}
+                  className="text-sm text-gray-300 hover:text-[#D4AF37] transition-colors tracking-wide"
+                >
+                  {item.label}
+                </button>
+              ))}
+            </nav>
+
+            <div className="flex items-center gap-3">
+              <a href={WA_LINK} target="_blank" rel="noopener noreferrer">
+                <Button
+                  data-ocid="nav.primary_button"
+                  className="hidden sm:flex border border-[#D4AF37] text-[#D4AF37] bg-transparent hover:bg-[#D4AF37] hover:text-black transition-all duration-300 text-sm font-semibold tracking-wider px-5"
+                >
+                  Request Bulk Quote
+                </Button>
+              </a>
+              <button
+                type="button"
+                className="lg:hidden text-gray-300 hover:text-[#D4AF37] p-2"
+                onClick={() => setMobileMenuOpen((v) => !v)}
+              >
+                <div className="w-5 space-y-1.5">
+                  <span
+                    className={`block h-0.5 bg-current transition-all duration-300 ${
+                      mobileMenuOpen ? "rotate-45 translate-y-2" : ""
+                    }`}
+                  />
+                  <span
+                    className={`block h-0.5 bg-current transition-all duration-300 ${
+                      mobileMenuOpen ? "opacity-0" : ""
+                    }`}
+                  />
+                  <span
+                    className={`block h-0.5 bg-current transition-all duration-300 ${
+                      mobileMenuOpen ? "-rotate-45 -translate-y-2" : ""
+                    }`}
+                  />
                 </div>
-                <p
-                  className="text-lg font-semibold"
-                  style={{
-                    color: "#D4AF5A",
-                    fontFamily: "Playfair Display, serif",
-                  }}
-                >
-                  Thank you for your feedback!
-                </p>
-              </div>
-            ) : (
-              <>
-                <h3
-                  className="text-xl font-bold tracking-wider uppercase mb-6 text-center"
-                  style={{
-                    color: "#D4AF5A",
-                    fontFamily: "Playfair Display, serif",
-                  }}
-                >
-                  Your Feedback
-                </h3>
-                <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-                  <div>
-                    <label
-                      htmlFor="feedback-name"
-                      className="block text-xs tracking-widest uppercase mb-2"
-                      style={{ color: "#B8953F" }}
-                    >
-                      Name
-                    </label>
-                    <input
-                      id="feedback-name"
-                      data-ocid="feedback.input"
-                      type="text"
-                      required
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Your name"
-                      className="w-full px-4 py-3 text-sm outline-none"
-                      style={{
-                        background: "#0B0B0C",
-                        border: "1px solid rgba(212,175,90,0.3)",
-                        color: "#E8E8E8",
-                        borderRadius: "2px",
-                      }}
-                    />
-                  </div>
-
-                  <div>
-                    <span
-                      className="block text-xs tracking-widest uppercase mb-2"
-                      style={{ color: "#B8953F" }}
-                    >
-                      Rating
-                    </span>
-                    <div className="flex gap-2">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                          key={star}
-                          type="button"
-                          data-ocid={`feedback.toggle.${star}`}
-                          onClick={() => setRating(star)}
-                          onMouseEnter={() => setHoverRating(star)}
-                          onMouseLeave={() => setHoverRating(0)}
-                          style={{
-                            background: "transparent",
-                            border: "none",
-                            cursor: "pointer",
-                            padding: 0,
-                          }}
-                          aria-label={`Rate ${star} stars`}
-                        >
-                          <svg
-                            className="w-7 h-7"
-                            viewBox="0 0 20 20"
-                            fill={
-                              (hoverRating || rating) >= star
-                                ? "#D4AF5A"
-                                : "rgba(212,175,90,0.2)"
-                            }
-                            aria-hidden="true"
-                          >
-                            <title>star</title>
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="feedback-message"
-                      className="block text-xs tracking-widest uppercase mb-2"
-                      style={{ color: "#B8953F" }}
-                    >
-                      Message
-                    </label>
-                    <textarea
-                      id="feedback-message"
-                      data-ocid="feedback.textarea"
-                      required
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      placeholder="Share your experience..."
-                      rows={4}
-                      className="w-full px-4 py-3 text-sm outline-none resize-none"
-                      style={{
-                        background: "#0B0B0C",
-                        border: "1px solid rgba(212,175,90,0.3)",
-                        color: "#E8E8E8",
-                        borderRadius: "2px",
-                      }}
-                    />
-                  </div>
-
-                  <button
-                    data-ocid="feedback.submit_button"
-                    type="submit"
-                    className="w-full py-3 text-sm font-semibold tracking-widest uppercase transition-opacity"
-                    style={{
-                      background: "linear-gradient(135deg, #D4AF5A, #B8953F)",
-                      color: "#0B0B0C",
-                      border: "none",
-                      borderRadius: "2px",
-                      letterSpacing: "0.15em",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Submit Feedback
-                  </button>
-                </form>
-              </>
-            )}
+              </button>
+            </div>
           </div>
         </div>
-      )}
-    </section>
-  );
-}
 
-// ── Contact ───────────────────────────────────────────────────────────────────
-function Contact() {
-  return (
-    <section
-      id="contact"
-      className="py-16 md:py-24"
-      style={{ background: "#111214" }}
-      data-ocid="contact.section"
-    >
-      <div className="max-w-3xl mx-auto px-6 text-left md:text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.9 }}
-        >
-          <p className="text-xs tracking-ultra text-gold mb-4">GET IN TOUCH</p>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl tracking-widest text-[#F2F2F2] font-semibold mb-4">
-            CONNECT WITH HYDROELITE
-          </h2>
-          <p className="text-xs tracking-widest text-gold mb-8 md:mb-10">
-            NEW DELHI HEAD OFFICE
-          </p>
-          <div className="w-16 h-px bg-gold opacity-50 md:mx-auto mb-10 md:mb-14" />
-          <div className="flex flex-col gap-5 mb-10 md:mb-14">
-            <div className="flex items-start md:items-center justify-start md:justify-center gap-4 text-[#B8B8B8] text-sm">
-              <MapPin
-                size={16}
-                className="text-gold flex-shrink-0 mt-0.5 md:mt-0"
-              />
-              <span>New Friends Colony, New Delhi — 110025, India</span>
-            </div>
-            <div className="flex items-center justify-start md:justify-center gap-4 text-[#B8B8B8] text-sm">
-              <Mail size={16} className="text-gold flex-shrink-0" />
-              <a
-                href="mailto:officialhydroelite@gmail.com"
-                className="hover:text-gold transition-colors min-h-[44px] flex items-center"
+        {mobileMenuOpen && (
+          <div className="lg:hidden bg-[#111] border-t border-[#2a2a2a] px-4 py-4 space-y-1">
+            {NAV_ITEMS.map((item) => (
+              <button
+                type="button"
+                key={item.href}
+                onClick={() => scrollTo(item.href)}
+                className="block w-full text-left py-2.5 px-3 text-gray-200 hover:text-[#D4AF37] hover:bg-[#1a1a1a] rounded transition-colors"
               >
-                officialhydroelite@gmail.com
-              </a>
-            </div>
-            <div className="flex items-center justify-start md:justify-center gap-4 text-[#B8B8B8] text-sm">
-              <Phone size={16} className="text-gold flex-shrink-0" />
-              <a
-                href="tel:+919990768012"
-                className="hover:text-gold transition-colors min-h-[44px] flex items-center"
-              >
-                +91 9990768012
-              </a>
-            </div>
-          </div>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-start md:justify-center gap-4">
+                {item.label}
+              </button>
+            ))}
             <a
-              href="https://wa.me/919990768012?text=Hello%20HydroElite%2C%20I%20would%20like%20to%20know%20more"
+              href={WA_LINK}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gold text-black text-xs tracking-widest px-10 py-4 hover:opacity-90 transition-all duration-300 font-semibold min-h-[44px]"
-              data-ocid="contact.primary_button"
+              className="block mt-3"
             >
-              <WhatsAppIcon />
-              ORDER ON WHATSAPP
-            </a>
-            <a
-              href="https://www.instagram.com/hydroelite_pvt/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-3 border border-gold text-gold text-xs tracking-widest px-10 py-4 hover:bg-gold hover:text-black transition-all duration-300 font-semibold min-h-[44px]"
-              data-ocid="contact.secondary_button"
-            >
-              <SiInstagram size={16} />
-              FOLLOW ON INSTAGRAM
+              <Button className="w-full border border-[#D4AF37] text-[#D4AF37] bg-transparent hover:bg-[#D4AF37] hover:text-black">
+                Request Bulk Quote
+              </Button>
             </a>
           </div>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
+        )}
+      </header>
 
-function Footer() {
-  const year = new Date().getFullYear();
-  const hostname =
-    typeof window !== "undefined" ? window.location.hostname : "hydroelite.in";
-  const [modal, setModal] = useState<"privacy" | "terms" | null>(null);
-
-  return (
-    <>
-      <footer
-        className="py-14 border-t"
-        style={{ background: "#0B0B0C", borderColor: "#2A2B2E" }}
-        data-ocid="footer.section"
+      {/* Hero */}
+      <section
+        id="hero"
+        className="relative min-h-screen flex items-center justify-center overflow-hidden"
+        style={{
+          backgroundImage:
+            "url('/assets/generated/hydroelite-bulk-supply.dim_1200x700.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
       >
-        <div className="max-w-7xl mx-auto px-6 lg:px-10">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="flex flex-col items-center md:items-start gap-4">
-              <span className="font-display text-2xl tracking-widest font-semibold text-gold">
-                HYDROELITE
-              </span>
-              <div className="flex items-center gap-4">
+        <div className="absolute inset-0 bg-black/75" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.65) 100%)",
+          }}
+        />
+        <div className="relative z-10 text-center px-4 sm:px-8 max-w-5xl mx-auto py-24 animate-fade-up">
+          <p className="text-xs sm:text-sm tracking-[0.4em] text-[#D4AF37] uppercase mb-6 font-semibold">
+            Premium Alkaline Water
+          </p>
+          <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight mb-6">
+            HydroElite –{" "}
+            <span className="text-[#D4AF37]">Premium Alkaline Water</span>,
+            <br className="hidden sm:block" />
+            Exclusively for Bulk &amp; Institutional Supply
+          </h1>
+          <p className="text-base sm:text-lg lg:text-xl text-gray-300 max-w-3xl mx-auto mb-10 leading-relaxed">
+            Trusted by events, corporates, gyms, and hospitality partners for
+            high-quality hydration solutions.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <a href={WA_LINK} target="_blank" rel="noopener noreferrer">
+              <Button
+                data-ocid="hero.primary_button"
+                className="w-full sm:w-auto bg-[#D4AF37] hover:bg-[#e8cb6a] text-black font-bold text-base px-10 py-6 tracking-wide shadow-xl shadow-[#D4AF37]/20 transition-all duration-300"
+              >
+                Request Bulk Quote
+              </Button>
+            </a>
+            <button
+              type="button"
+              data-ocid="hero.secondary_button"
+              onClick={() => scrollTo("#contact")}
+              className="w-full sm:w-auto border border-white/40 hover:border-[#D4AF37] text-white hover:text-[#D4AF37] px-10 py-4 text-base font-semibold tracking-wide transition-all duration-300 rounded"
+            >
+              Contact Us
+            </button>
+          </div>
+          <p className="mt-6 text-sm text-yellow-400/90 font-medium">
+            ⚠️ Bulk orders only. No retail sales.
+          </p>
+        </div>
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce opacity-40">
+          <div className="w-px h-12 bg-[#D4AF37]/60 mx-auto" />
+        </div>
+      </section>
+
+      {/* Who We Serve */}
+      <section id="who-we-serve" className="py-24 px-4 sm:px-8 bg-[#0a0a0a]">
+        <div className="max-w-7xl mx-auto">
+          <Reveal className="text-center mb-16">
+            <p className="text-xs tracking-[0.4em] text-[#D4AF37] uppercase mb-3">
+              Our Clients
+            </p>
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white gold-line gold-line-center pb-4">
+              Who We Serve
+            </h2>
+          </Reveal>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mt-12">
+            {[
+              {
+                emoji: "🎊",
+                title: "Events & Weddings",
+                desc: "Premium hydration for your most memorable occasions",
+              },
+              {
+                emoji: "🏢",
+                title: "Corporate Offices",
+                desc: "Elevate workplace wellness with alkaline water",
+              },
+              {
+                emoji: "💪",
+                title: "Gyms & Fitness",
+                desc: "Fuel performance with pH-balanced hydration",
+              },
+              {
+                emoji: "🏨",
+                title: "Hotels & Cafes",
+                desc: "Set a premium standard for your guests",
+              },
+              {
+                emoji: "🚚",
+                title: "Distributors",
+                desc: "Partner with us to expand your premium portfolio",
+              },
+            ].map((item, i) => (
+              <Reveal
+                key={item.title}
+                delay={i * 80}
+                className="group bg-[#1a1a1a] border border-[#2a2a2a] hover:border-[#D4AF37]/50 rounded p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#D4AF37]/10 cursor-default"
+              >
+                <div className="text-4xl mb-4">{item.emoji}</div>
+                <h3 className="font-display text-base font-semibold text-white mb-2 group-hover:text-[#D4AF37] transition-colors">
+                  {item.title}
+                </h3>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  {item.desc}
+                </p>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose */}
+      <section id="why-us" className="py-24 px-4 sm:px-8 bg-[#111]">
+        <div className="max-w-6xl mx-auto">
+          <Reveal className="text-center mb-16">
+            <p className="text-xs tracking-[0.4em] text-[#D4AF37] uppercase mb-3">
+              Our Advantage
+            </p>
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white gold-line gold-line-center pb-4">
+              Why Choose HydroElite
+            </h2>
+          </Reveal>
+          <div className="grid md:grid-cols-2 gap-5">
+            {[
+              {
+                title: "Balanced Alkaline Water",
+                desc: "pH 8.0–9.0 for premium hydration. Every batch tested and certified for optimal mineral balance.",
+              },
+              {
+                title: "Premium Black Bottle Design",
+                desc: "Stands out in any premium setting. Our signature black bottle communicates luxury at first sight.",
+              },
+              {
+                title: "Bulk Supply Capability",
+                desc: "Handles 100 to 10,000+ bottles per order. Scalable supply chain built for institutional demand.",
+              },
+              {
+                title: "Consistent Quality",
+                desc: "Every batch tested and certified. FSSAI compliant, BIS certified. Zero compromise on quality.",
+              },
+              {
+                title: "Custom Branding Available",
+                desc: "Your logo, your brand. Private label and event branding for complete brand alignment.",
+              },
+            ].map((item, i) => (
+              <Reveal
+                key={item.title}
+                delay={i * 100}
+                className={`flex gap-5 p-6 rounded border transition-all duration-300 hover:border-[#D4AF37]/30 hover:shadow-lg hover:shadow-[#D4AF37]/5 ${
+                  i % 2 === 0
+                    ? "bg-[#0a0a0a] border-[#1e1e1e]"
+                    : "bg-[#161616] border-[#2a2a2a]"
+                }`}
+              >
+                <span className="text-[#D4AF37] text-base mt-0.5 shrink-0">
+                  ◆
+                </span>
+                <div>
+                  <h3 className="font-display text-lg font-semibold text-white mb-2">
+                    {item.title}
+                  </h3>
+                  <p className="text-sm text-gray-400 leading-relaxed">
+                    {item.desc}
+                  </p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+          <Reveal
+            className="flex flex-wrap justify-center gap-4 mt-14"
+            delay={200}
+          >
+            {[
+              "FSSAI Certified",
+              "BIS Approved",
+              "pH 8.0–9.0 Guaranteed",
+              "Delhi NCR Delivery",
+            ].map((badge) => (
+              <div
+                key={badge}
+                className="flex items-center gap-2 border border-[#D4AF37]/30 rounded-full px-5 py-2 text-xs text-[#D4AF37] tracking-wider"
+              >
+                <span>✓</span> {badge}
+              </div>
+            ))}
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Products */}
+      <section id="products" className="py-24 px-4 sm:px-8 bg-[#0a0a0a]">
+        <div className="max-w-6xl mx-auto">
+          <Reveal className="text-center mb-16">
+            <p className="text-xs tracking-[0.4em] text-[#D4AF37] uppercase mb-3">
+              The Product
+            </p>
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white gold-line gold-line-center pb-4">
+              Our Premium Alkaline Water
+            </h2>
+          </Reveal>
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <Reveal className="order-2 lg:order-1 space-y-6">
+              <div className="inline-flex items-center gap-2 border border-[#D4AF37]/40 rounded-full px-4 py-1.5 text-xs text-[#D4AF37] tracking-widest uppercase">
+                🚫 Bulk Orders Only
+              </div>
+              <h3 className="font-display text-3xl sm:text-4xl font-bold text-white leading-tight">
+                HydroElite pH8+
+                <span className="block text-[#D4AF37]">Alkaline Water</span>
+              </h3>
+              <div className="space-y-3">
+                {[
+                  "500ml Premium Black Bottle",
+                  "Alkaline pH 8.0–9.0 Certified",
+                  "Electrolyte Enhanced Formula",
+                  "FSSAI & BIS Certified",
+                ].map((feat) => (
+                  <div
+                    key={feat}
+                    className="flex items-center gap-3 text-gray-300"
+                  >
+                    <span className="text-[#D4AF37] text-xs">◆</span>
+                    <span className="text-sm">{feat}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed italic border-l-2 border-[#D4AF37]/30 pl-4">
+                &ldquo;Designed to stand out in premium environments.&rdquo;
+              </p>
+              <p className="text-xs text-gray-500 bg-[#1a1a1a] border border-[#2a2a2a] rounded p-3">
+                Available exclusively for institutional, event, and corporate
+                bulk orders.
+              </p>
+              <a href={WA_LINK} target="_blank" rel="noopener noreferrer">
+                <Button
+                  data-ocid="products.primary_button"
+                  className="bg-[#D4AF37] hover:bg-[#e8cb6a] text-black font-bold px-8 py-5 tracking-wide"
+                >
+                  Request Bulk Quote
+                </Button>
+              </a>
+            </Reveal>
+            <Reveal className="order-1 lg:order-2 flex justify-center">
+              <div className="relative">
+                <div className="absolute inset-0 bg-[#D4AF37]/5 rounded-full blur-3xl scale-75" />
+                <img
+                  src="/assets/generated/hydroelite-bulk-bottle.dim_800x1000.png"
+                  alt="HydroElite pH8+ Premium Alkaline Water Bottle"
+                  className="relative z-10 max-h-[520px] w-auto object-contain bottle-glow"
+                />
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
+      {/* Bulk Ordering */}
+      <section id="bulk-orders" className="py-24 px-4 sm:px-8 bg-[#111]">
+        <div className="max-w-6xl mx-auto">
+          <Reveal className="text-center mb-16">
+            <p className="text-xs tracking-[0.4em] text-[#D4AF37] uppercase mb-3">
+              Volume Pricing
+            </p>
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white gold-line gold-line-center pb-4">
+              Bulk Pricing Tiers
+            </h2>
+            <p className="text-gray-400 mt-6 text-sm">
+              All pricing is custom — contact us for a tailored quote.
+            </p>
+          </Reveal>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                tier: "Starter",
+                range: "100–500 Bottles",
+                desc: "Perfect for events, small offices, and trial orders",
+                features: [
+                  "Competitive bulk pricing",
+                  "Standard 3–5 day delivery",
+                  "Quality certificate included",
+                  "Dedicated order support",
+                ],
+                highlight: false,
+                badge: null as string | null,
+              },
+              {
+                tier: "Mid-Volume",
+                range: "500–1,000 Bottles",
+                desc: "Ideal for recurring corporate and hospitality orders",
+                features: [
+                  "Priority dispatch",
+                  "Dedicated account support",
+                  "Flexible payment terms",
+                  "Custom label option available",
+                ],
+                highlight: true,
+                badge: "Popular" as string | null,
+              },
+              {
+                tier: "Enterprise",
+                range: "1,000+ Bottles",
+                desc: "Best value for large-scale institutional supply",
+                features: [
+                  "Best pricing guaranteed",
+                  "Dedicated account manager",
+                  "Priority SLA",
+                  "Full custom branding available",
+                ],
+                highlight: false,
+                badge: "Best Value" as string | null,
+              },
+            ].map((tier, i) => (
+              <Reveal
+                key={tier.tier}
+                delay={i * 100}
+                className={`relative rounded border p-8 flex flex-col transition-all duration-300 hover:-translate-y-1 ${
+                  tier.highlight
+                    ? "bg-[#1a1500] border-[#D4AF37] gold-glow"
+                    : "bg-[#1a1a1a] border-[#2a2a2a] hover:border-[#D4AF37]/40"
+                }`}
+              >
+                {tier.badge && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <span className="bg-[#D4AF37] text-black text-xs font-bold px-4 py-1 rounded-full tracking-wider uppercase">
+                      {tier.badge}
+                    </span>
+                  </div>
+                )}
+                <div className="mb-6">
+                  <p className="text-xs text-[#D4AF37] tracking-widest uppercase mb-2">
+                    {tier.tier}
+                  </p>
+                  <h3 className="font-display text-2xl font-bold text-white mb-3">
+                    {tier.range}
+                  </h3>
+                  <p className="text-sm text-gray-400">{tier.desc}</p>
+                </div>
+                <ul className="space-y-2.5 mb-8 flex-1">
+                  {tier.features.map((f) => (
+                    <li
+                      key={f}
+                      className="flex items-start gap-2.5 text-sm text-gray-300"
+                    >
+                      <span className="text-[#D4AF37] mt-0.5">✓</span> {f}
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-xs text-gray-500 text-center py-3 border-t border-[#2a2a2a] mb-4">
+                  Contact for pricing
+                </p>
+                <a href={WA_LINK} target="_blank" rel="noopener noreferrer">
+                  <Button
+                    data-ocid={`bulk.request_quote.button.${i + 1}`}
+                    className={`w-full font-semibold tracking-wide ${
+                      tier.highlight
+                        ? "bg-[#D4AF37] hover:bg-[#e8cb6a] text-black"
+                        : "border border-[#D4AF37] text-[#D4AF37] bg-transparent hover:bg-[#D4AF37] hover:text-black"
+                    }`}
+                  >
+                    Request Quote
+                  </Button>
+                </a>
+              </Reveal>
+            ))}
+          </div>
+          <Reveal className="text-center mt-10" delay={300}>
+            <p className="text-sm text-gray-400">
+              Custom pricing available for large orders.{" "}
+              <a
+                href={WA_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#D4AF37] hover:underline"
+              >
+                Contact us for enterprise rates →
+              </a>
+            </p>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Custom Branding */}
+      <section id="branding" className="py-24 px-4 sm:px-8 bg-[#0a0a0a]">
+        <div className="max-w-5xl mx-auto">
+          <Reveal className="text-center mb-16">
+            <p className="text-xs tracking-[0.4em] text-[#D4AF37] uppercase mb-3">
+              White Label
+            </p>
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white gold-line gold-line-center pb-4">
+              Private Label & Event Branding Available
+            </h2>
+            <p className="text-gray-400 mt-6 max-w-xl mx-auto">
+              Make every bottle represent your brand.
+            </p>
+          </Reveal>
+          <div className="grid sm:grid-cols-3 gap-6">
+            {[
+              {
+                icon: "🖨️",
+                title: "Logo Printing",
+                desc: "Your logo printed directly on bottles. High-resolution print for maximum brand impact.",
+              },
+              {
+                icon: "📦",
+                title: "Custom Packaging",
+                desc: "Branded boxes and crates for a complete premium end-to-end presentation.",
+              },
+              {
+                icon: "🎯",
+                title: "Event Branding",
+                desc: "Perfect for weddings, conferences, and product launches. Make your event unforgettable.",
+              },
+            ].map((item, i) => (
+              <Reveal
+                key={item.title}
+                delay={i * 120}
+                className="group bg-[#1a1a1a] border border-[#2a2a2a] hover:border-[#D4AF37]/50 rounded p-8 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#D4AF37]/10"
+              >
+                <div className="text-5xl mb-5">{item.icon}</div>
+                <h3 className="font-display text-xl font-semibold text-white mb-3 group-hover:text-[#D4AF37] transition-colors">
+                  {item.title}
+                </h3>
+                <p className="text-sm text-gray-400 leading-relaxed">
+                  {item.desc}
+                </p>
+              </Reveal>
+            ))}
+          </div>
+          <Reveal className="text-center mt-12" delay={400}>
+            <a href={WA_LINK} target="_blank" rel="noopener noreferrer">
+              <Button
+                data-ocid="branding.primary_button"
+                className="border border-[#D4AF37] text-[#D4AF37] bg-transparent hover:bg-[#D4AF37] hover:text-black px-10 py-5 font-semibold tracking-wider"
+              >
+                Enquire About Custom Branding
+              </Button>
+            </a>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-24 px-4 sm:px-8 bg-[#111] relative overflow-hidden">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="w-[600px] h-[300px] bg-[#D4AF37]/5 rounded-full blur-[120px]" />
+        </div>
+        <Reveal className="relative z-10 max-w-4xl mx-auto text-center">
+          <div className="border border-[#D4AF37]/20 rounded-lg p-10 sm:p-14 bg-[#0a0a0a]/60">
+            <p className="text-xs tracking-[0.4em] text-[#D4AF37] uppercase mb-4">
+              Let&apos;s Partner
+            </p>
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6">
+              Looking for Bulk Supply?{" "}
+              <span className="text-[#D4AF37]">Let&apos;s Work Together.</span>
+            </h2>
+            <p className="text-gray-400 text-base max-w-2xl mx-auto mb-10">
+              Join leading events, hotels, gyms, and corporates who trust
+              HydroElite for premium hydration.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a href={WA_LINK} target="_blank" rel="noopener noreferrer">
+                <Button
+                  data-ocid="cta.primary_button"
+                  className="w-full sm:w-auto bg-[#D4AF37] hover:bg-[#e8cb6a] text-black font-bold px-10 py-6 text-base tracking-wide shadow-xl shadow-[#D4AF37]/20"
+                >
+                  Request Bulk Quote
+                </Button>
+              </a>
+              <a href={WA_LINK} target="_blank" rel="noopener noreferrer">
+                <Button
+                  data-ocid="cta.whatsapp_button"
+                  style={{ backgroundColor: "#25D366" }}
+                  className="w-full sm:w-auto font-bold px-10 py-6 text-base tracking-wide text-white hover:opacity-90"
+                >
+                  💬 WhatsApp Us
+                </Button>
+              </a>
+            </div>
+            <p className="mt-6 text-xs text-gray-500">
+              Response within 24 hours. Bulk orders only.
+            </p>
+          </div>
+        </Reveal>
+      </section>
+
+      {/* Contact */}
+      <section id="contact" className="py-24 px-4 sm:px-8 bg-[#0a0a0a]">
+        <div className="max-w-4xl mx-auto">
+          <Reveal className="text-center mb-12">
+            <p className="text-xs tracking-[0.4em] text-[#D4AF37] uppercase mb-3">
+              Reach Us
+            </p>
+            <h2 className="font-display text-3xl sm:text-4xl font-bold text-white gold-line gold-line-center pb-4">
+              Get in Touch
+            </h2>
+          </Reveal>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {(
+              [
+                {
+                  icon: "📍",
+                  label: "Address",
+                  value: "New Friends Colony, New Delhi, 110025",
+                  href: null,
+                  green: false,
+                  red: false,
+                },
+                {
+                  icon: "✉️",
+                  label: "Email",
+                  value: "officialhydroelite@gmail.com",
+                  href: "mailto:officialhydroelite@gmail.com",
+                  green: false,
+                  red: false,
+                },
+                {
+                  icon: "💬",
+                  label: "WhatsApp",
+                  value: "+91 9990768012",
+                  href: WA_LINK,
+                  green: true,
+                  red: false,
+                },
+                {
+                  icon: "📸",
+                  label: "Instagram",
+                  value: "@hydroelite_pvt",
+                  href: "https://www.instagram.com/hydroelite_pvt/",
+                  green: false,
+                  red: true,
+                },
+              ] as const
+            ).map((item) => (
+              <Reveal
+                key={item.label}
+                className="bg-[#1a1a1a] border border-[#2a2a2a] rounded p-6 text-center hover:border-[#D4AF37]/30 transition-colors"
+              >
+                <div className="text-3xl mb-3">{item.icon}</div>
+                <p className="text-xs text-[#D4AF37] tracking-widest uppercase mb-1">
+                  {item.label}
+                </p>
+                {item.href ? (
+                  <a
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`text-sm font-medium transition-colors hover:underline ${
+                      item.green
+                        ? "text-[#25D366]"
+                        : item.red
+                          ? "text-[#E1306C]"
+                          : "text-gray-300 hover:text-[#D4AF37]"
+                    }`}
+                  >
+                    {item.value}
+                  </a>
+                ) : (
+                  <p className="text-sm text-gray-300">{item.value}</p>
+                )}
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-[#080808] border-t border-[#1a1a1a] py-12 px-4 sm:px-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid sm:grid-cols-3 gap-8 mb-10">
+            <div>
+              <h3 className="font-display text-2xl font-bold text-[#D4AF37] mb-2">
+                HydroElite
+              </h3>
+              <p className="text-xs text-gray-500 tracking-wider uppercase">
+                Premium Alkaline Water | Bulk Supply Only
+              </p>
+              <div className="mt-4 inline-flex items-center gap-2 border border-red-500/40 rounded-full px-3 py-1">
                 <a
                   href="https://www.instagram.com/hydroelite_pvt/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Instagram"
-                  className="text-[#B8B8B8] hover:text-gold transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
-                  data-ocid="footer.link"
+                  className="text-xs text-[#E1306C] hover:text-red-400 transition-colors font-medium"
                 >
-                  <SiInstagram size={16} />
-                </a>
-                <a
-                  href="https://facebook.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Facebook"
-                  className="text-[#B8B8B8] hover:text-gold transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
-                  data-ocid="footer.link"
-                >
-                  <SiFacebook size={16} />
-                </a>
-                <a
-                  href="https://x.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="X / Twitter"
-                  className="text-[#B8B8B8] hover:text-gold transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
-                  data-ocid="footer.link"
-                >
-                  <SiX size={16} />
+                  📸 @hydroelite_pvt
                 </a>
               </div>
             </div>
-            <ul className="flex flex-col md:flex-row items-center gap-2 md:gap-6">
-              {[
-                "HOME",
-                "OUR WATER",
-                "PRODUCTS",
-                "AVAILABILITY",
-                "FOUNDER",
-                "CONTACT",
-              ].map((link) => (
-                <li key={link}>
-                  <a
-                    href={`#${link.toLowerCase().replace(" ", "-")}`}
-                    className="text-xs tracking-widest text-[#B8B8B8] hover:text-gold transition-colors min-h-[44px] flex items-center"
-                    data-ocid="footer.link"
+            <div>
+              <p className="text-xs text-gray-500 tracking-widest uppercase mb-4">
+                Quick Links
+              </p>
+              <div className="space-y-2">
+                {NAV_ITEMS.map((item) => (
+                  <button
+                    type="button"
+                    key={item.href}
+                    onClick={() => scrollTo(item.href)}
+                    className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors"
                   >
-                    {link}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div
-            className="mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-[#B8B8B8]"
-            style={{ borderTop: "1px solid #2A2B2E" }}
-          >
-            <span>&copy; {year} HydroElite. All rights reserved.</span>
-            <div className="flex items-center gap-4">
-              <button
-                type="button"
-                onClick={() => setModal("privacy")}
-                className="hover:text-gold transition-colors tracking-widest"
-                data-ocid="footer.link"
-              >
-                PRIVACY POLICY
-              </button>
-              <span className="text-[#2A2B2E]">|</span>
-              <button
-                type="button"
-                onClick={() => setModal("terms")}
-                className="hover:text-gold transition-colors tracking-widest"
-                data-ocid="footer.link"
-              >
-                TERMS &amp; CONDITIONS
-              </button>
+                    {item.label}
+                  </button>
+                ))}
+              </div>
             </div>
-            <span>
-              Built with ❤️ using{" "}
+            <div>
+              <p className="text-xs text-gray-500 tracking-widest uppercase mb-4">
+                Legal
+              </p>
+              <div className="space-y-2">
+                <LegalModal
+                  trigger={
+                    <button
+                      type="button"
+                      data-ocid="footer.privacy_button"
+                      className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors"
+                    >
+                      Privacy Policy
+                    </button>
+                  }
+                  title="Privacy Policy"
+                  content={PRIVACY_POLICY}
+                />
+                <LegalModal
+                  trigger={
+                    <button
+                      type="button"
+                      data-ocid="footer.terms_button"
+                      className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors"
+                    >
+                      Terms &amp; Conditions
+                    </button>
+                  }
+                  title="Terms & Conditions"
+                  content={TERMS_CONDITIONS}
+                />
+                <LegalModal
+                  trigger={
+                    <button
+                      type="button"
+                      data-ocid="footer.about_button"
+                      className="block text-sm text-gray-400 hover:text-[#D4AF37] transition-colors"
+                    >
+                      About Us
+                    </button>
+                  }
+                  title="About HydroElite"
+                  content={ABOUT_US}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-[#1a1a1a] pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-center sm:text-left">
+              <p className="text-xs text-gray-600">
+                © {new Date().getFullYear()} HydroElite. All rights reserved.
+              </p>
+              <p className="text-xs text-[#D4AF37]/40 mt-1 tracking-wide">
+                🚫 Bulk Orders Only – No Single Bottle Sales
+              </p>
+            </div>
+            <div className="flex items-center gap-4">
+              <FeedbackModal />
+              <span className="text-gray-700">|</span>
               <a
-                href={`https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(hostname)}`}
+                href={`https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-gold transition-colors"
+                className="text-xs text-gray-600 hover:text-gray-400 transition-colors"
               >
-                caffeine.ai
+                Built with ❤️ using caffeine.ai
               </a>
-            </span>
+            </div>
           </div>
         </div>
       </footer>
 
-      {modal === "privacy" && (
-        <Modal title="PRIVACY POLICY" onClose={() => setModal(null)}>
-          <p className="text-gold text-xs tracking-widest">
-            Effective Date: 2024
-          </p>
-          <div className="space-y-4">
-            <section>
-              <h3 className="text-[#F2F2F2] text-xs tracking-widest font-semibold mb-2">
-                1. INFORMATION WE COLLECT
-              </h3>
-              <p>
-                When you place an order or contact us via our website or
-                WhatsApp, we may collect your name, phone number, delivery
-                address, and order details.
-              </p>
-            </section>
-            <section>
-              <h3 className="text-[#F2F2F2] text-xs tracking-widest font-semibold mb-2">
-                2. USE OF INFORMATION
-              </h3>
-              <p>
-                Your information is used solely to process and deliver your
-                orders and to communicate with you about your purchases. We do
-                not sell or share your personal data with third parties.
-              </p>
-            </section>
-            <section>
-              <h3 className="text-[#F2F2F2] text-xs tracking-widest font-semibold mb-2">
-                3. DATA SECURITY
-              </h3>
-              <p>
-                We take reasonable steps to protect your personal information.
-                However, no method of transmission over the internet is 100%
-                secure.
-              </p>
-            </section>
-            <section>
-              <h3 className="text-[#F2F2F2] text-xs tracking-widest font-semibold mb-2">
-                4. CONTACT
-              </h3>
-              <p>
-                For any privacy concerns, please contact us at{" "}
-                <a
-                  href="mailto:officialhydroelite@gmail.com"
-                  className="text-gold hover:underline"
-                >
-                  officialhydroelite@gmail.com
-                </a>
-                .
-              </p>
-            </section>
-          </div>
-        </Modal>
-      )}
-
-      {modal === "terms" && (
-        <Modal title="TERMS &amp; CONDITIONS" onClose={() => setModal(null)}>
-          <div className="space-y-4">
-            <section>
-              <h3 className="text-[#F2F2F2] text-xs tracking-widest font-semibold mb-2">
-                1. ABOUT US
-              </h3>
-              <p>
-                Hydroelite provides premium alkaline drinking water. Our goal is
-                to deliver clean, healthy, and refreshing water to our
-                customers.
-              </p>
-            </section>
-            <section>
-              <h3 className="text-[#F2F2F2] text-xs tracking-widest font-semibold mb-2">
-                2. PRODUCT INFORMATION
-              </h3>
-              <p>
-                We make every effort to ensure that product details, images, and
-                prices are accurate. Minor errors may happen; we reserve the
-                right to correct them.
-              </p>
-            </section>
-            <section>
-              <h3 className="text-[#F2F2F2] text-xs tracking-widest font-semibold mb-2">
-                3. ORDERS &amp; PAYMENTS
-              </h3>
-              <p>
-                Orders placed via our website or WhatsApp are subject to
-                confirmation. We reserve the right to accept or cancel orders at
-                our discretion.
-              </p>
-            </section>
-            <section>
-              <h3 className="text-[#F2F2F2] text-xs tracking-widest font-semibold mb-2">
-                4. PRICING
-              </h3>
-              <p>
-                Prices are as displayed on the website at the time of ordering.
-                Delivery charges (if any) will be communicated before confirming
-                your order.
-              </p>
-            </section>
-            <section>
-              <h3 className="text-[#F2F2F2] text-xs tracking-widest font-semibold mb-2">
-                5. DELIVERY
-              </h3>
-              <p>
-                We try our best to deliver within the estimated time. Delays may
-                occur due to unforeseen circumstances (weather, transport,
-                etc.).
-              </p>
-            </section>
-            <section>
-              <h3 className="text-[#F2F2F2] text-xs tracking-widest font-semibold mb-2">
-                6. USAGE
-              </h3>
-              <p>
-                Our water products are meant for daily hydration and wellness.
-                They are not a substitute for medical advice or treatment.
-              </p>
-            </section>
-            <section>
-              <h3 className="text-[#F2F2F2] text-xs tracking-widest font-semibold mb-2">
-                7. INTELLECTUAL PROPERTY
-              </h3>
-              <p>
-                All content on this website, including logos, images, and text,
-                is the property of Hydroelite. Do not use any content without
-                permission.
-              </p>
-            </section>
-          </div>
-        </Modal>
-      )}
-    </>
-  );
-}
-
-// ── App ───────────────────────────────────────────────────────────────────────
-export default function App() {
-  return (
-    <div style={{ background: "#0B0B0C", minHeight: "100vh" }}>
-      <Navbar />
-      <main>
-        <Hero />
-        <Features />
-        <Product />
-        <Availability />
-        <Founder />
-        <Feedback />
-        <Contact />
-      </main>
-      <Footer />
-      <FloatingWhatsApp />
+      {/* Floating WhatsApp */}
+      <a
+        href={WA_LINK}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-ocid="floating.whatsapp_button"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-transform hover:scale-110"
+        style={{ backgroundColor: "#25D366" }}
+        title="WhatsApp Us for Bulk Orders"
+        aria-label="WhatsApp Us for Bulk Orders"
+      >
+        <span className="sr-only">WhatsApp Us for Bulk Orders</span>
+        <svg
+          viewBox="0 0 24 24"
+          fill="white"
+          className="w-7 h-7"
+          aria-hidden="true"
+        >
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+        </svg>
+      </a>
     </div>
   );
 }
